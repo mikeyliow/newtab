@@ -2,6 +2,7 @@
 	import type { Meal } from '$lib/types';
 	import { api } from '$lib/client/api';
 	import { Plus, X } from '@lucide/svelte';
+	import { slide } from 'svelte/transition';
 
 	let {
 		meals,
@@ -99,7 +100,7 @@
 		{#if meals.length}
 			<ul>
 				{#each meals as meal (meal.id)}
-					<li>
+					<li transition:slide={{ duration: 160 }}>
 						<span class="meal-name">{meal.name}</span>
 						<span class="meal-kcal">{meal.kcal}</span>
 						<button class="ghost" onclick={() => api.removeMeal(meal.id)} aria-label="remove meal">

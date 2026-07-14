@@ -2,6 +2,8 @@
 	import type { Shortcut } from '$lib/types';
 	import { api } from '$lib/client/api';
 	import { Plus, X, Globe, GripVertical } from '@lucide/svelte';
+	import { slide } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
 
 	let { shortcuts }: { shortcuts: Shortcut[] } = $props();
 
@@ -84,6 +86,9 @@
 				class:dragging={dragIdx === i}
 				class:drag-over={overIdx === i && dragIdx !== null && dragIdx !== i}
 				role="listitem"
+				animate:flip={{ duration: 220 }}
+				in:slide={{ duration: 180 }}
+				out:slide={{ duration: 160 }}
 				draggable="true"
 				ondragstart={(e) => {
 					dragIdx = i;

@@ -5,6 +5,8 @@
 	import ItemRow from './ItemRow.svelte';
 	import { Plus, ListFilter, Check } from '@lucide/svelte';
 	import { browser } from '$app/environment';
+	import { slide } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
 
 	let { items }: { items: Item[] } = $props();
 
@@ -49,8 +51,12 @@
 			(i) => i.status === 'open' && (i.context ? selected.includes(i.context) : selected.includes('untagged'))
 		)
 	);
-	// flat, compact list: do → think → queue, keeping flagged-first within each kind
-	const sorted = $derived(KINDS.flatMap((k) => filtered.filter((i) => i.kind === k)));
+	// flat, compact list: pinned first (they took over the old Now strip), then do → think → queue
+	const byKind = (list: Item[]) => KINDS.flatMap((k) => list.filter((i) => i.kind === k));
+	const sorted = $derived([
+		...byKind(filtered.filter((i) => i.flagged)),
+		...byKind(filtered.filter((i) => !i.flagged))
+	]);
 
 	async function add(e: SubmitEvent) {
 		e.preventDefault();
@@ -141,7 +147,9 @@
 			<p class="empty">{filterActive ? 'Nothing matches the filter.' : 'Nothing here. Nice.'}</p>
 		{/if}
 		{#each sorted as item (item.id)}
-			<ItemRow {item} />
+			<div animate:flip={{ duration: 220 }} in:slide={{ duration: 180 }} out:slide={{ duration: 160 }}>
+				<ItemRow {item} />
+			</div>
 		{/each}
 	</div>
 </section>

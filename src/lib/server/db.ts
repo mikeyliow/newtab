@@ -118,7 +118,7 @@ function seedIfEmpty(db: Database.Database) {
 }
 
 export const DEFAULT_WIDGETS = [
-	{ id: 'now', visible: true, order: 1, sensitive: false },
+	{ id: 'focus', visible: true, order: 1, sensitive: false },
 	{ id: 'items', visible: true, order: 2, sensitive: false },
 	{ id: 'shortcuts', visible: true, order: 3, sensitive: false },
 	{ id: 'calories', visible: true, order: 4, sensitive: true },

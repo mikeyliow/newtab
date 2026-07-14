@@ -92,7 +92,7 @@
 				</button>
 				<button onclick={() => run(() => api.updateItem(item.id, { flagged: !item.flagged }))}>
 					<Pin size={14} />
-					{item.flagged ? 'Unpin' : 'Pin to Now'}
+					{item.flagged ? 'Unpin' : 'Pin to top'}
 				</button>
 				{#if item.url}
 					<a href={item.url} target="_blank" rel="noreferrer" onclick={() => (menuOpen = false)}>

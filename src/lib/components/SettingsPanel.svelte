@@ -13,7 +13,7 @@
 	let wallpaper = $state(config.wallpaper);
 
 	const widgetNames: Record<string, string> = {
-		now: 'Now',
+		focus: 'Focus',
 		items: 'Items',
 		calories: 'Calories',
 		budget: 'Budget (parked)',

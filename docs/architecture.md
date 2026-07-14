@@ -44,16 +44,16 @@ Two families of data:
 - **items** — things you toggle open/done. The `kind` carries urgency (`do` > `think` > `queue`) — deliberately no due dates or timers. `queue` items can carry a `medium` (read/listen/watch) and `url`.
 - **logs** — things you append to: `meals` (freeform calorie log) and `spending` (schema + API live, widget parked for v1).
 
-Plus **config** — a single row (`id = 1`): greeting name, wallpaper url, calorie target, monthly budget, `shortcuts` JSON, `widgets` JSON, and a `focus` line (API/MCP-only; no widget renders it).
+Plus **config** — a single row (`id = 1`): focus line, greeting name, wallpaper url, calorie target, monthly budget, `shortcuts` JSON, `widgets` JSON.
 
 ## The screen
 
 Single page, one glance — no sub-pages or tabs. Desktop is a two-column grid (main column + 340px sidebar), collapsing to one column under 960px.
 
 - **Widget config drives the layout**: `config.widgets` is `[{id, visible, order, sensitive}]`. Settings toggles visibility and reorders — no code change. Shortcuts (and budget, later) render in the sidebar; now/items/calories in the main column; both respect the config order. Unknown ids are ignored.
-- **Item rows** are flat and compact (no kind headers) — the coloured kind icon carries that signal — sorted do → think → queue, flagged first within each kind. Each row has a dropdown menu (mark done / pin / open link / delete) instead of a checkbox. A multi-select context filter (work/heirlight/content/personal/untagged) persists per device in `localStorage`, like privacy mode.
+- **Item rows** are flat and compact (no kind headers) — the coloured kind icon carries that signal — pinned items first, then do → think → queue. Each row has a dropdown menu (mark done / pin to top / open link / delete) instead of a checkbox. List changes animate (FLIP + slide). A multi-select context filter (work/heirlight/content/personal/untagged) persists per device in `localStorage`, like privacy mode.
 - **Calories** renders as a compact sidebar card below shortcuts: kcal total (+ progress bar when a target is set) and three macro mini-bars coloured per macro, filled by each macro's share of calories (4/4/9 kcal per gram).
-- **Now strip** = open `do` items + anything flagged, derived client-side.
+- **Focus** = a one-line editable intention at the top of the main column (stored in config).
 - **Privacy mode** (eye icon) blurs every widget with `sensitive: true` — for screen-sharing. Persisted per device in `localStorage`, not in config.
 - **Mutations**: components call `src/lib/client/api.ts` (fetch → `invalidateAll()`), so the page reloads its data after every write. No client cache to drift.
 - **Customization** lives in config (Settings, `PATCH /api/config`, or MCP): greeting name, wallpaper image url (rendered as a fixed cover background), shortcuts, widget layout. Shortcut icons are fetched from Google's favicon service by domain, falling back to a globe icon.

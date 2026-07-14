@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import NowWidget from '$lib/components/NowWidget.svelte';
+	import FocusWidget from '$lib/components/FocusWidget.svelte';
 	import ItemsWidget from '$lib/components/ItemsWidget.svelte';
 	import CaloriesWidget from '$lib/components/CaloriesWidget.svelte';
 	import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
@@ -35,16 +35,12 @@
 	);
 
 	// widgets split into the main column and the right sidebar, both config-ordered
-	const MAIN = ['now', 'items'];
+	const MAIN = ['focus', 'items'];
 	const SIDEBAR = ['shortcuts', 'calories', 'budget'];
 	const visible = $derived(
 		[...dash.config.widgets].sort((a, b) => a.order - b.order).filter((w) => w.visible)
 	);
-	// an empty Now must not render a wrapper at all — the column gap would push Items down
-	const hasNow = $derived(dash.items.some((i) => i.status === 'open' && (i.flagged || i.kind === 'do')));
-	const mainWidgets = $derived(
-		visible.filter((w) => MAIN.includes(w.id)).filter((w) => w.id !== 'now' || hasNow)
-	);
+	const mainWidgets = $derived(visible.filter((w) => MAIN.includes(w.id)));
 	const sideWidgets = $derived(visible.filter((w) => SIDEBAR.includes(w.id)));
 </script>
 
@@ -93,8 +89,8 @@
 			<div class="col main-col">
 				{#each mainWidgets as widget (widget.id)}
 					<div class:sensitive-blur={privacy && widget.sensitive}>
-						{#if widget.id === 'now'}
-							<NowWidget items={dash.items} />
+						{#if widget.id === 'focus'}
+							<FocusWidget focus={dash.config.focus} />
 						{:else if widget.id === 'items'}
 							<ItemsWidget items={dash.items} />
 						{/if}
