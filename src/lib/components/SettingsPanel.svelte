@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Config } from '$lib/types';
 	import { api } from '$lib/client/api';
-	import { ArrowUp, ArrowDown, Eye, EyeOff, X } from '@lucide/svelte';
+	import { ArrowUp, ArrowDown, Eye, EyeOff, Lock, LockOpen, X } from '@lucide/svelte';
 
 	let { config, onclose }: { config: Config; onclose: () => void } = $props();
 
@@ -27,6 +27,12 @@
 	async function toggleWidget(id: string) {
 		await api.patchConfig({
 			widgets: config.widgets.map((w) => (w.id === id ? { ...w, visible: !w.visible } : w))
+		});
+	}
+
+	async function toggleSensitive(id: string) {
+		await api.patchConfig({
+			widgets: config.widgets.map((w) => (w.id === id ? { ...w, sensitive: !w.sensitive } : w))
 		});
 	}
 
@@ -74,7 +80,15 @@
 						<button class="ghost" onclick={() => move(w.id, 1)} aria-label="move down">
 							<ArrowDown size={14} />
 						</button>
-						<button class="ghost" onclick={() => toggleWidget(w.id)} aria-label="toggle visibility">
+						<button
+							class="ghost"
+							onclick={() => toggleSensitive(w.id)}
+							aria-label="toggle private"
+							title={w.sensitive ? 'blurred in privacy mode — click to unmark' : 'mark private (blurred in privacy mode)'}
+						>
+							{#if w.sensitive}<Lock size={14} />{:else}<LockOpen size={14} />{/if}
+						</button>
+						<button class="ghost" onclick={() => toggleWidget(w.id)} aria-label="toggle visibility" title={w.visible ? 'hide widget' : 'show widget'}>
 							{#if w.visible}<Eye size={14} />{:else}<EyeOff size={14} />{/if}
 						</button>
 					</span>
