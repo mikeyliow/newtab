@@ -13,7 +13,6 @@
 	let wallpaper = $state(config.wallpaper);
 
 	const widgetNames: Record<string, string> = {
-		focus: 'Focus',
 		now: 'Now',
 		items: 'Items',
 		calories: 'Calories',
@@ -21,7 +20,9 @@
 		shortcuts: 'Shortcuts'
 	};
 
-	const sorted = $derived([...config.widgets].sort((a, b) => a.order - b.order));
+	const sorted = $derived(
+		[...config.widgets].filter((w) => widgetNames[w.id]).sort((a, b) => a.order - b.order)
+	);
 
 	async function toggleWidget(id: string) {
 		await api.patchConfig({

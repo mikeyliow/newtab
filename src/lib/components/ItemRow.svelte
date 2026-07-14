@@ -1,10 +1,22 @@
 <script lang="ts">
 	import type { Item } from '$lib/types';
 	import { api } from '$lib/client/api';
-	import { Zap, Lightbulb, BookOpen, Headphones, Play, Inbox, Pin, X, Check } from '@lucide/svelte';
+	import {
+		Zap,
+		Lightbulb,
+		BookOpen,
+		Headphones,
+		Play,
+		Inbox,
+		Pin,
+		Trash2,
+		Check,
+		ChevronDown,
+		ExternalLink
+	} from '@lucide/svelte';
 
 	let { item }: { item: Item } = $props();
-	let busy = $state(false);
+	let menuOpen = $state(false);
 
 	const icons = {
 		do: Zap,
@@ -29,28 +41,15 @@
 		return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 	}
 
-	async function toggle() {
-		busy = true;
-		try {
-			await api.updateItem(item.id, { status: item.status === 'done' ? 'open' : 'done' });
-		} finally {
-			busy = false;
-		}
-	}
-
-	async function toggleFlag() {
-		await api.updateItem(item.id, { flagged: !item.flagged });
-	}
-
-	async function remove() {
-		await api.removeItem(item.id);
+	async function run(action: () => Promise<unknown>) {
+		menuOpen = false;
+		await action();
 	}
 </script>
 
-<div class="row" class:done={item.status === 'done'}>
-	<button class="tick" onclick={toggle} disabled={busy} aria-label="toggle done">
-		{#if item.status === 'done'}<Check size={13} strokeWidth={3} />{/if}
-	</button>
+<svelte:window onclick={() => (menuOpen = false)} />
+
+<div class="row" class:done={item.status === 'done'} class:open-menu={menuOpen}>
 	<span class="kind-icon kind-{item.kind}"><Icon size={18} aria-hidden="true" /></span>
 	<div class="stack">
 		{#if item.url}
@@ -59,6 +58,9 @@
 			<span class="title">{item.title}</span>
 		{/if}
 		<span class="meta">
+			{#if item.flagged}
+				<Pin size={11} fill="currentColor" class="pin-mark" /><span class="sep">·</span>
+			{/if}
 			{#if item.context}
 				<span class="dot ctx-{item.context}"></span>{item.context}<span class="sep">·</span>
 			{/if}
@@ -68,14 +70,43 @@
 			added {relTime(item.created_at)}
 		</span>
 	</div>
-	<span class="actions">
-		<button class="ghost" onclick={toggleFlag} aria-label="pin" title={item.flagged ? 'unpin' : 'pin'}>
-			<Pin size={15} fill={item.flagged ? 'currentColor' : 'none'} />
+
+	<div class="menu-wrap">
+		<button
+			class="ghost opener"
+			aria-label="item options"
+			aria-expanded={menuOpen}
+			onclick={(e) => {
+				e.stopPropagation();
+				menuOpen = !menuOpen;
+			}}
+		>
+			<ChevronDown size={16} />
 		</button>
-		<button class="ghost delete" onclick={remove} aria-label="delete" title="delete">
-			<X size={15} />
-		</button>
-	</span>
+		{#if menuOpen}
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+			<div class="menu card" onclick={(e) => e.stopPropagation()}>
+				<button onclick={() => run(() => api.updateItem(item.id, { status: item.status === 'done' ? 'open' : 'done' }))}>
+					<Check size={14} />
+					{item.status === 'done' ? 'Reopen' : 'Mark done'}
+				</button>
+				<button onclick={() => run(() => api.updateItem(item.id, { flagged: !item.flagged }))}>
+					<Pin size={14} />
+					{item.flagged ? 'Unpin' : 'Pin to Now'}
+				</button>
+				{#if item.url}
+					<a href={item.url} target="_blank" rel="noreferrer" onclick={() => (menuOpen = false)}>
+						<ExternalLink size={14} />
+						Open link
+					</a>
+				{/if}
+				<button class="danger" onclick={() => run(() => api.removeItem(item.id))}>
+					<Trash2 size={14} />
+					Delete
+				</button>
+			</div>
+		{/if}
+	</div>
 </div>
 
 <style>
@@ -83,32 +114,11 @@
 		display: flex;
 		align-items: center;
 		gap: 14px;
-		padding: 15px 0;
+		padding: 14px 0;
 		border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
 	}
 	.row:last-child {
 		border-bottom: none;
-	}
-	.tick {
-		flex: none;
-		width: 19px;
-		height: 19px;
-		border: 1.5px solid var(--muted-2);
-		border-radius: 6px;
-		background: none;
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--card);
-		padding: 0;
-	}
-	.tick:hover {
-		border-color: var(--foreground);
-	}
-	.done .tick {
-		background: var(--foreground);
-		border-color: var(--foreground);
 	}
 	.kind-icon {
 		flex: none;
@@ -153,6 +163,9 @@
 		white-space: nowrap;
 		overflow: hidden;
 	}
+	.meta :global(.pin-mark) {
+		color: var(--kind-do);
+	}
 	.sep {
 		color: var(--border);
 	}
@@ -174,17 +187,60 @@
 	.ctx-personal {
 		background: var(--ctx-personal);
 	}
-	.actions {
+
+	.menu-wrap {
 		margin-left: auto;
+		position: relative;
 		flex: none;
-		display: inline-flex;
-		gap: 2px;
+	}
+	.opener {
 		opacity: 0;
 	}
-	.row:hover .actions {
+	.row:hover .opener,
+	.opener:focus-visible,
+	.open-menu .opener {
 		opacity: 1;
 	}
-	.delete:hover {
+	.menu {
+		position: absolute;
+		right: 0;
+		top: calc(100% + 4px);
+		z-index: 20;
+		min-width: 160px;
+		padding: 6px;
+		box-shadow: var(--shadow-md);
+		display: flex;
+		flex-direction: column;
+	}
+	.menu button,
+	.menu a {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
+		background: none;
+		border: none;
+		font: inherit;
+		font-size: 14px;
+		color: var(--foreground);
+		text-decoration: none;
+		padding: 8px 10px;
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		text-align: left;
+	}
+	.menu button:hover,
+	.menu a:hover {
+		background: var(--muted);
+	}
+	.menu .danger {
+		color: var(--destructive);
+	}
+	.menu :global(svg) {
+		color: var(--muted-foreground);
+		flex: none;
+	}
+	.menu .danger :global(svg) {
 		color: var(--destructive);
 	}
 </style>

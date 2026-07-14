@@ -1,23 +1,27 @@
 {
 	"config": {
-		"focus": "Ship the newtab dashboard.",
+		"focus": "",
 		"name": "Mikey",
 		"wallpaper": "",
 		"calorie_target": null,
 		"budget_month": null,
 		"shortcuts": [
-			{ "id": "sc-gmail", "label": "Gmail", "url": "https://mail.google.com", "icon": "mail" },
-			{ "id": "sc-cal", "label": "Calendar", "url": "https://calendar.google.com", "icon": "calendar" },
-			{ "id": "sc-github", "label": "GitHub", "url": "https://github.com", "icon": "github" },
-			{ "id": "sc-youtube", "label": "YouTube", "url": "https://youtube.com", "icon": "youtube" }
+			{ "id": "sc-x", "label": "X", "url": "https://x.com" },
+			{ "id": "sc-showdown", "label": "Pokémon Showdown", "url": "https://play.pokemonshowdown.com" },
+			{ "id": "sc-whatsapp", "label": "WhatsApp", "url": "https://web.whatsapp.com" },
+			{ "id": "sc-facebook", "label": "Facebook", "url": "https://www.facebook.com" },
+			{ "id": "sc-reddit", "label": "Reddit", "url": "https://www.reddit.com" },
+			{ "id": "sc-youtube", "label": "YouTube", "url": "https://www.youtube.com" },
+			{ "id": "sc-linkedin", "label": "LinkedIn", "url": "https://www.linkedin.com/feed/" },
+			{ "id": "sc-discord", "label": "Discord", "url": "https://discord.com/channels/@me" },
+			{ "id": "sc-instagram", "label": "Instagram", "url": "https://www.instagram.com" }
 		],
 		"widgets": [
-			{ "id": "focus", "visible": true, "order": 1, "sensitive": false },
-			{ "id": "now", "visible": true, "order": 2, "sensitive": false },
-			{ "id": "items", "visible": true, "order": 3, "sensitive": false },
-			{ "id": "calories", "visible": true, "order": 4, "sensitive": true },
-			{ "id": "budget", "visible": false, "order": 5, "sensitive": true },
-			{ "id": "shortcuts", "visible": true, "order": 6, "sensitive": false }
+			{ "id": "now", "visible": true, "order": 1, "sensitive": false },
+			{ "id": "items", "visible": true, "order": 2, "sensitive": false },
+			{ "id": "calories", "visible": true, "order": 3, "sensitive": true },
+			{ "id": "budget", "visible": false, "order": 4, "sensitive": true },
+			{ "id": "shortcuts", "visible": true, "order": 5, "sensitive": false }
 		]
 	},
 	"items": [

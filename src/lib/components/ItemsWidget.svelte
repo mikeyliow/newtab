@@ -21,11 +21,8 @@
 	const filtered = $derived(
 		items.filter((i) => i.status === 'open' && (!contextFilter || i.context === contextFilter))
 	);
-	const grouped = $derived(
-		KINDS.map((k) => ({ kind: k, items: filtered.filter((i) => i.kind === k) })).filter(
-			(g) => g.items.length
-		)
-	);
+	// flat, compact list: do → think → queue, keeping flagged-first within each kind
+	const sorted = $derived(KINDS.flatMap((k) => filtered.filter((i) => i.kind === k)));
 
 	async function add(e: SubmitEvent) {
 		e.preventDefault();
@@ -92,16 +89,11 @@
 			</form>
 		{/if}
 
-		{#if grouped.length === 0}
+		{#if sorted.length === 0}
 			<p class="empty">Nothing here. Nice.</p>
 		{/if}
-		{#each grouped as group (group.kind)}
-			<div class="group">
-				<span class="micro kind">{kindLabels[group.kind]}</span>
-				{#each group.items as item (item.id)}
-					<ItemRow {item} />
-				{/each}
-			</div>
+		{#each sorted as item (item.id)}
+			<ItemRow {item} />
 		{/each}
 	</div>
 </section>
@@ -132,10 +124,9 @@
 		color: var(--background);
 	}
 	.body {
-		padding: 10px 24px;
+		padding: 6px 24px;
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
 	}
 	form {
 		display: flex;
@@ -153,14 +144,6 @@
 	.grow {
 		flex: 1;
 		min-width: 140px;
-	}
-	.group {
-		display: flex;
-		flex-direction: column;
-	}
-	.kind {
-		font-size: 11px;
-		margin-top: 6px;
 	}
 	.empty {
 		color: var(--muted-2);
