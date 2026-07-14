@@ -55,7 +55,7 @@ Single page, one glance — no sub-pages or tabs. Desktop is a two-column grid (
 - **Privacy mode** (eye icon) blurs every widget with `sensitive: true` — for screen-sharing. Persisted per device in `localStorage`, not in config.
 - **Mutations**: components call `src/lib/client/api.ts` (fetch → `invalidateAll()`), so the page reloads its data after every write. No client cache to drift.
 - **Customization** lives in config (Settings, `PATCH /api/config`, or MCP): greeting name, wallpaper image url (rendered as a fixed cover background), shortcuts, widget layout. Shortcut icons are fetched from Google's favicon service by domain, falling back to a globe icon.
-- **Theme** follows the system (`prefers-color-scheme`); design tokens in `src/app.css` (titan: warm monochrome, Geist + Geist Mono, white cards on warm beige).
+- **Theme**: light only, by choice. Design tokens in `src/app.css` (titan: warm near-white, Geist + Geist Mono, white cards) plus muted accent tones per item kind (`--kind-*`) and context (`--ctx-*`).
 
 ## Backup
 

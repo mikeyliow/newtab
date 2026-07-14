@@ -165,7 +165,7 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		padding: 4px 0;
+		padding: 9px 0;
 		font-size: 14px;
 		border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
 	}

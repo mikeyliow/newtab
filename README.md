@@ -56,4 +56,4 @@ All 15 tools (items, meals, spending, focus, targets, shortcuts) are listed with
 - **spending** — schema ready, widget parked for v1.
 - **config** — focus line, calorie target, shortcuts, widget layout (show/hide/reorder from Settings; `sensitive` widgets blur in privacy mode).
 
-Design system: **titan** (warm minimal monochrome, Geist + Geist Mono) — tokens in [src/app.css](src/app.css), theme follows the system (light/dark).
+Design system: **titan** (warm minimal, Geist + Geist Mono, muted accent tones) — tokens in [src/app.css](src/app.css), light theme only.

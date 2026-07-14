@@ -31,33 +31,17 @@
 	--shadow: 0px 4px 12px 0px hsl(0 0% 0% / 0.06);
 	--shadow-md: 0px 6px 18px 0px hsl(0 0% 0% / 0.08);
 	--tracking-tight: -0.03em;
-}
 
-/* theme = auto (follows system) */
-@media (prefers-color-scheme: dark) {
-	:root {
-		--background: #111111;
-		--foreground: #f3efeb;
-		--card: #1a1a1a;
-		--card-foreground: #f3efeb;
-		--primary: #f3efeb;
-		--primary-foreground: #111111;
-		--muted: #1f1f1f;
-		--muted-foreground: #8a8a87;
-		--muted-2: #615e5b;
-		--accent: #2a2a28;
-		--accent-foreground: #f3efeb;
-		--destructive: #ef4444;
-		--border: #2a2a28;
-		--input: #2a2a28;
-		--ring: #f3efeb;
-		--chart-1: #f3efeb;
-		--chart-2: #d8d3cc;
-		--chart-3: #8a8a87;
-		--chart-4: #615e5b;
-		--chart-5: #1f1f1f;
-	}
+	/* muted accent tones — enough colour to scan by, never loud */
+	--kind-do: #c05f3c;       /* terracotta — act now */
+	--kind-think: #8a6fc8;    /* soft violet — mulling */
+	--kind-queue: #4b9d6e;    /* sage green — consume later */
+	--ctx-work: #5b7da0;
+	--ctx-heirlight: #c99a2e;
+	--ctx-content: #c76f8a;
+	--ctx-personal: #55987a;
 }
+/* theme: light only, by choice */
 
 * {
 	box-sizing: border-box;

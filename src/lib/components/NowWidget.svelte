@@ -21,6 +21,6 @@
 
 <style>
 	.body {
-		padding: 8px 20px;
+		padding: 4px 24px;
 	}
 </style>

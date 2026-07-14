@@ -109,35 +109,6 @@
 			top 2.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 	}
 
-	@media (prefers-color-scheme: dark) {
-		.b1 {
-			background: radial-gradient(circle at 35% 35%, #2c2418 0%, transparent 66%);
-		}
-		.b2 {
-			background: radial-gradient(circle at 60% 40%, #2c211e 0%, transparent 64%);
-		}
-		.b3 {
-			background: radial-gradient(circle at 50% 50%, #202619 0%, transparent 66%);
-		}
-		.b4 {
-			background: radial-gradient(circle at 45% 55%, #1d2329 0%, transparent 64%);
-		}
-		.b5 {
-			background: radial-gradient(circle at 50% 40%, #271f2a 0%, transparent 62%);
-		}
-		.b6 {
-			background: radial-gradient(circle at 50% 50%, #262415 0%, transparent 62%);
-		}
-		.c1 {
-			background: radial-gradient(circle, #322a1c 0%, transparent 60%);
-			opacity: 0.95;
-		}
-		.c2 {
-			background: radial-gradient(circle, #262031 0%, transparent 58%);
-			opacity: 0.7;
-		}
-	}
-
 	/* fine film grain so the gradients don't band */
 	.grain {
 		position: absolute;

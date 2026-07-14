@@ -132,10 +132,10 @@
 		color: var(--background);
 	}
 	.body {
-		padding: 14px 20px;
+		padding: 10px 24px;
 		display: flex;
 		flex-direction: column;
-		gap: 14px;
+		gap: 10px;
 	}
 	form {
 		display: flex;
@@ -160,7 +160,7 @@
 	}
 	.kind {
 		font-size: 11px;
-		margin-bottom: 2px;
+		margin-top: 6px;
 	}
 	.empty {
 		color: var(--muted-2);
