@@ -1,0 +1,153 @@
+/* titan design tokens — warm minimal monochrome (design-styles/titan) */
+:root {
+	--background: #ffffff;
+	--foreground: #111111;
+	--card: #f3efeb;
+	--card-foreground: #111111;
+	--primary: #111111;
+	--primary-foreground: #ffffff;
+	--muted: #f3efeb;
+	--muted-foreground: #615e5b;
+	--muted-2: #8a8a87;
+	--accent: #d8d3cc;
+	--accent-foreground: #111111;
+	--destructive: #b3261e;
+	--destructive-foreground: #ffffff;
+	--border: #d8d3cc;
+	--input: #d8d3cc;
+	--ring: #111111;
+	--chart-1: #111111;
+	--chart-2: #615e5b;
+	--chart-3: #8a8a87;
+	--chart-4: #d8d3cc;
+	--chart-5: #f3efeb;
+	--font-sans: 'Geist Variable', Geist, -apple-system, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif;
+	--font-mono: 'Geist Mono Variable', 'Geist Mono', 'SF Mono', Monaco, ui-monospace, monospace;
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-lg: 20px;
+	--radius-pill: 9999px;
+	--shadow-sm: 0px 2px 6px 0px hsl(0 0% 0% / 0.06);
+	--shadow: 0px 4px 12px 0px hsl(0 0% 0% / 0.08);
+	--shadow-md: 0px 6px 18px 0px hsl(0 0% 0% / 0.08);
+	--tracking-tight: -0.03em;
+}
+
+/* theme = auto (follows system) */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background: #111111;
+		--foreground: #f3efeb;
+		--card: #1a1a1a;
+		--card-foreground: #f3efeb;
+		--primary: #f3efeb;
+		--primary-foreground: #111111;
+		--muted: #1f1f1f;
+		--muted-foreground: #8a8a87;
+		--muted-2: #615e5b;
+		--accent: #2a2a28;
+		--accent-foreground: #f3efeb;
+		--destructive: #ef4444;
+		--border: #2a2a28;
+		--input: #2a2a28;
+		--ring: #f3efeb;
+		--chart-1: #f3efeb;
+		--chart-2: #d8d3cc;
+		--chart-3: #8a8a87;
+		--chart-4: #615e5b;
+		--chart-5: #1f1f1f;
+	}
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: var(--font-sans);
+	font-size: 16px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+	font-weight: 500;
+	letter-spacing: var(--tracking-tight);
+	margin: 0;
+}
+
+a {
+	color: inherit;
+}
+
+/* geist mono uppercase micro-label — the signature eyebrow */
+.micro {
+	font-family: var(--font-mono);
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--muted-foreground);
+}
+
+/* black pill CTA */
+.pill {
+	font-family: var(--font-sans);
+	font-size: 13px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	background: var(--primary);
+	color: var(--primary-foreground);
+	border: none;
+	border-radius: var(--radius-pill);
+	padding: 8px 20px;
+	cursor: pointer;
+}
+.pill:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+/* quiet icon button */
+.ghost {
+	background: none;
+	border: none;
+	padding: 4px;
+	border-radius: var(--radius-sm);
+	color: var(--muted-2);
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+}
+.ghost:hover {
+	color: var(--foreground);
+	background: var(--accent);
+}
+
+input,
+select {
+	font: inherit;
+	color: var(--foreground);
+	background: var(--background);
+	border: 1px solid var(--input);
+	border-radius: var(--radius-md);
+	padding: 8px 12px;
+}
+input:focus,
+select:focus {
+	outline: 2px solid var(--ring);
+	outline-offset: 1px;
+}
+
+/* privacy mode: blur sensitive widgets */
+.sensitive-blur {
+	filter: blur(10px);
+	pointer-events: none;
+	user-select: none;
+}

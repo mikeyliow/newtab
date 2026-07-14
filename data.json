@@ -1,0 +1,31 @@
+{
+	"config": {
+		"focus": "Ship the newtab dashboard.",
+		"calorie_target": null,
+		"budget_month": null,
+		"shortcuts": [
+			{ "id": "sc-gmail", "label": "Gmail", "url": "https://mail.google.com", "icon": "mail" },
+			{ "id": "sc-cal", "label": "Calendar", "url": "https://calendar.google.com", "icon": "calendar" },
+			{ "id": "sc-github", "label": "GitHub", "url": "https://github.com", "icon": "github" },
+			{ "id": "sc-youtube", "label": "YouTube", "url": "https://youtube.com", "icon": "youtube" }
+		],
+		"widgets": [
+			{ "id": "focus", "visible": true, "order": 1, "sensitive": false },
+			{ "id": "now", "visible": true, "order": 2, "sensitive": false },
+			{ "id": "items", "visible": true, "order": 3, "sensitive": false },
+			{ "id": "calories", "visible": true, "order": 4, "sensitive": true },
+			{ "id": "budget", "visible": false, "order": 5, "sensitive": true },
+			{ "id": "shortcuts", "visible": true, "order": 6, "sensitive": false }
+		]
+	},
+	"items": [
+		{
+			"kind": "queue",
+			"medium": "read",
+			"context": "work",
+			"title": "How to grow your AEO function — PostHog",
+			"url": "https://posthog.com/blog/aeo-advice",
+			"source": "reading-list"
+		}
+	]
+}
