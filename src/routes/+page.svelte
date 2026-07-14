@@ -6,6 +6,7 @@
 	import CaloriesWidget from '$lib/components/CaloriesWidget.svelte';
 	import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+	import Background from '$lib/components/Background.svelte';
 	import { Settings2, EyeOff, Eye } from '@lucide/svelte';
 	import { browser } from '$app/environment';
 
@@ -50,6 +51,9 @@
 	class:has-wallpaper={!!dash.config.wallpaper}
 	style:background-image={dash.config.wallpaper ? `url(${dash.config.wallpaper})` : undefined}
 >
+	{#if !dash.config.wallpaper}
+		<Background />
+	{/if}
 	<main>
 		<header class="top">
 			<div>
