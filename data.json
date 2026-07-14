@@ -6,22 +6,73 @@
 		"calorie_target": null,
 		"budget_month": null,
 		"shortcuts": [
-			{ "id": "sc-x", "label": "X", "url": "https://x.com" },
-			{ "id": "sc-showdown", "label": "Pokémon Showdown", "url": "https://play.pokemonshowdown.com" },
-			{ "id": "sc-whatsapp", "label": "WhatsApp", "url": "https://web.whatsapp.com" },
-			{ "id": "sc-facebook", "label": "Facebook", "url": "https://www.facebook.com" },
-			{ "id": "sc-reddit", "label": "Reddit", "url": "https://www.reddit.com" },
-			{ "id": "sc-youtube", "label": "YouTube", "url": "https://www.youtube.com" },
-			{ "id": "sc-linkedin", "label": "LinkedIn", "url": "https://www.linkedin.com/feed/" },
-			{ "id": "sc-discord", "label": "Discord", "url": "https://discord.com/channels/@me" },
-			{ "id": "sc-instagram", "label": "Instagram", "url": "https://www.instagram.com" }
+			{
+				"id": "sc-x",
+				"label": "X",
+				"url": "https://x.com"
+			},
+			{
+				"id": "sc-whatsapp",
+				"label": "WhatsApp",
+				"url": "https://web.whatsapp.com"
+			},
+			{
+				"id": "sc-reddit",
+				"label": "Reddit",
+				"url": "https://www.reddit.com"
+			},
+			{
+				"id": "sc-youtube",
+				"label": "YouTube",
+				"url": "https://www.youtube.com"
+			},
+			{
+				"id": "sc-instagram",
+				"label": "Instagram",
+				"url": "https://www.instagram.com"
+			},
+			{
+				"id": "4e647e70-9247-4d3a-a123-3560172a284a",
+				"label": "Threads",
+				"url": "https://www.threads.com/"
+			},
+			{
+				"id": "ff3df246-75f2-4074-864f-80f5d52bbdbf",
+				"label": "Github",
+				"url": "https://github.com/"
+			}
 		],
 		"widgets": [
-			{ "id": "focus", "visible": true, "order": 1, "sensitive": false },
-			{ "id": "items", "visible": true, "order": 2, "sensitive": false },
-			{ "id": "shortcuts", "visible": true, "order": 3, "sensitive": false },
-			{ "id": "calories", "visible": true, "order": 4, "sensitive": true },
-			{ "id": "budget", "visible": false, "order": 5, "sensitive": true }
+			{
+				"id": "focus",
+				"visible": true,
+				"order": 1,
+				"sensitive": false
+			},
+			{
+				"id": "items",
+				"visible": true,
+				"order": 2,
+				"sensitive": false
+			},
+			{
+				"id": "shortcuts",
+				"visible": true,
+				"order": 3,
+				"sensitive": false
+			},
+			{
+				"id": "calories",
+				"visible": true,
+				"order": 4,
+				"sensitive": true
+			},
+			{
+				"id": "budget",
+				"visible": false,
+				"order": 5,
+				"sensitive": true
+			}
 		]
 	},
 	"items": [
