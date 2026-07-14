@@ -50,9 +50,11 @@
 		now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
 	);
 
-	// widgets split into the main column and the right sidebar, both config-ordered
-	const MAIN = ['progress', 'focus', 'items'];
+	// widgets split into the main column and the right sidebar, both config-ordered.
+	// progress renders in the header's time block; its config entry still controls visibility.
+	const MAIN = ['focus', 'items'];
 	const SIDEBAR = ['shortcuts', 'calories', 'budget'];
+	const showProgress = $derived(dash.config.widgets.some((w) => w.id === 'progress' && w.visible));
 	const visible = $derived(
 		[...dash.config.widgets].sort((a, b) => a.order - b.order).filter((w) => w.visible)
 	);
@@ -81,6 +83,9 @@
 				<div class="status-row">
 					<StatusLines {now} />
 				</div>
+				{#if showProgress}
+					<ProgressWidget />
+				{/if}
 			</div>
 		</header>
 
@@ -92,9 +97,7 @@
 			<div class="col main-col">
 				{#each mainWidgets as widget (widget.id)}
 					<div class:sensitive-blur={privacy && widget.sensitive}>
-						{#if widget.id === 'progress'}
-							<ProgressWidget />
-						{:else if widget.id === 'focus'}
+						{#if widget.id === 'focus'}
 							<FocusWidget focus={dash.config.focus} />
 						{:else if widget.id === 'items'}
 							<ItemsWidget items={dash.items} doneToday={dash.done_today} />

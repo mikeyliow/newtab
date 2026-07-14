@@ -1,6 +1,6 @@
 <script lang="ts">
 	// the year as day-tiles, one column per week (the column rhythm marks the weeks).
-	// filled = gone, terracotta = today, faint = still yours.
+	// filled = gone, terracotta = today, faint = still yours. Lives in the header's time block.
 	let now = $state(new Date());
 	$effect(() => {
 		const t = setInterval(() => (now = new Date()), 60_000);
@@ -17,52 +17,54 @@
 </script>
 
 <section title="day {year.today} of {year.total} — {year.left} days left">
-	<span class="micro">Year</span>
 	<div class="grid">
 		{#each Array(year.total) as _, i (i)}
 			<span class="tile" class:past={i + 1 < year.today} class:today={i + 1 === year.today}
 			></span>
 		{/each}
 	</div>
-	<span class="left">{year.left}d</span>
+	<span class="meta"><span class="micro">Year</span>{year.left}d left</span>
 </section>
 
 <style>
 	section {
 		display: flex;
-		align-items: center;
-		gap: 14px;
-	}
-	.micro {
-		font-size: 10px;
-		flex: none;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 6px;
+		margin-top: 10px;
 	}
 	.grid {
 		display: grid;
 		grid-auto-flow: column;
-		grid-template-rows: repeat(7, 5px);
-		grid-auto-columns: 5px;
-		gap: 2.5px;
+		grid-template-rows: repeat(7, 4px);
+		grid-auto-columns: 4px;
+		gap: 2px;
 	}
 	.tile {
-		width: 5px;
-		height: 5px;
-		border-radius: 1.5px;
+		width: 4px;
+		height: 4px;
+		border-radius: 1px;
 		background: var(--input);
 		opacity: 0.45;
 	}
 	.tile.past {
 		background: var(--foreground);
-		opacity: 0.8;
+		opacity: 0.75;
 	}
 	.tile.today {
 		background: var(--kind-do);
 		opacity: 1;
 	}
-	.left {
+	.meta {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 8px;
 		font-family: var(--font-mono);
 		font-size: 11px;
 		color: var(--muted-2);
-		flex: none;
+	}
+	.meta .micro {
+		font-size: 10px;
 	}
 </style>
