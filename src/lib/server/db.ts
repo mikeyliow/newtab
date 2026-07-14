@@ -68,6 +68,11 @@ function migrate(db: Database.Database) {
 		CREATE INDEX IF NOT EXISTS idx_meals_date ON meals (date);
 		CREATE INDEX IF NOT EXISTS idx_spending_date ON spending (date);
 	`);
+
+	// additive column migrations for existing databases
+	const cols = (db.prepare('PRAGMA table_info(config)').all() as { name: string }[]).map((c) => c.name);
+	if (!cols.includes('name')) db.exec(`ALTER TABLE config ADD COLUMN name TEXT NOT NULL DEFAULT 'Mikey'`);
+	if (!cols.includes('wallpaper')) db.exec(`ALTER TABLE config ADD COLUMN wallpaper TEXT NOT NULL DEFAULT ''`);
 }
 
 function seedIfEmpty(db: Database.Database) {
@@ -83,13 +88,15 @@ function seedIfEmpty(db: Database.Database) {
 
 	const cfg = seed.config ?? {};
 	db.prepare(
-		'INSERT INTO config (id, focus, calorie_target, budget_month, shortcuts, widgets) VALUES (1, ?, ?, ?, ?, ?)'
+		'INSERT INTO config (id, focus, calorie_target, budget_month, shortcuts, widgets, name, wallpaper) VALUES (1, ?, ?, ?, ?, ?, ?, ?)'
 	).run(
 		cfg.focus ?? '',
 		cfg.calorie_target ?? null,
 		cfg.budget_month ?? null,
 		JSON.stringify(cfg.shortcuts ?? []),
-		JSON.stringify(cfg.widgets ?? DEFAULT_WIDGETS)
+		JSON.stringify(cfg.widgets ?? DEFAULT_WIDGETS),
+		cfg.name ?? 'Mikey',
+		cfg.wallpaper ?? ''
 	);
 
 	const insert = db.prepare(

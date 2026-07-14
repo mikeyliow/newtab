@@ -49,8 +49,8 @@
 </script>
 
 <section>
-	<header>
-		<span class="micro">Items</span>
+	<div class="widget-head">
+		<h2>Items</h2>
 		<nav class="filters">
 			<button class="chip" class:active={!contextFilter} onclick={() => (contextFilter = null)}>
 				all
@@ -65,56 +65,48 @@
 				</button>
 			{/each}
 		</nav>
-		<button class="ghost" onclick={() => (adding = !adding)} aria-label="add item">
-			<Plus size={16} />
+		<button class="soft" onclick={() => (adding = !adding)}>
+			<Plus size={14} /> Add
 		</button>
-	</header>
+	</div>
 
-	{#if adding}
-		<form onsubmit={add}>
-			<!-- svelte-ignore a11y_autofocus -->
-			<input class="grow" bind:value={title} placeholder="what is it?" autofocus />
-			<select bind:value={kind}>
-				{#each KINDS as k (k)}<option value={k}>{kindLabels[k]}</option>{/each}
-			</select>
-			{#if kind === 'queue'}
-				<select bind:value={medium}>
-					{#each MEDIUMS as m (m)}<option value={m}>{m}</option>{/each}
+	<div class="card body">
+		{#if adding}
+			<form onsubmit={add}>
+				<!-- svelte-ignore a11y_autofocus -->
+				<input class="grow" bind:value={title} placeholder="what is it?" autofocus />
+				<select bind:value={kind}>
+					{#each KINDS as k (k)}<option value={k}>{kindLabels[k]}</option>{/each}
 				</select>
-				<input class="grow" bind:value={url} placeholder="url (optional)" />
-			{/if}
-			<select bind:value={context}>
-				<option value="">no context</option>
-				{#each CONTEXTS as c (c)}<option value={c}>{c}</option>{/each}
-			</select>
-			<button class="pill" type="submit" disabled={saving}>Add</button>
-		</form>
-	{/if}
+				{#if kind === 'queue'}
+					<select bind:value={medium}>
+						{#each MEDIUMS as m (m)}<option value={m}>{m}</option>{/each}
+					</select>
+					<input class="grow" bind:value={url} placeholder="url (optional)" />
+				{/if}
+				<select bind:value={context}>
+					<option value="">no context</option>
+					{#each CONTEXTS as c (c)}<option value={c}>{c}</option>{/each}
+				</select>
+				<button class="pill" type="submit" disabled={saving}>Add</button>
+			</form>
+		{/if}
 
-	{#if grouped.length === 0}
-		<p class="empty">Nothing here. Nice.</p>
-	{/if}
-	{#each grouped as group (group.kind)}
-		<div class="group">
-			<span class="micro kind">{kindLabels[group.kind]}</span>
-			{#each group.items as item (item.id)}
-				<ItemRow {item} />
-			{/each}
-		</div>
-	{/each}
+		{#if grouped.length === 0}
+			<p class="empty">Nothing here. Nice.</p>
+		{/if}
+		{#each grouped as group (group.kind)}
+			<div class="group">
+				<span class="micro kind">{kindLabels[group.kind]}</span>
+				{#each group.items as item (item.id)}
+					<ItemRow {item} />
+				{/each}
+			</div>
+		{/each}
+	</div>
 </section>
 
 <style>
-	section {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-	}
-	header {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
 	.filters {
 		display: flex;
 		gap: 4px;
@@ -139,11 +131,17 @@
 		background: var(--foreground);
 		color: var(--background);
 	}
+	.body {
+		padding: 14px 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
 	form {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
-		background: var(--card);
+		background: var(--muted);
 		padding: 12px;
 		border-radius: var(--radius-md);
 	}

@@ -9,9 +9,9 @@
 </script>
 
 {#if now.length}
-	<section class="card">
-		<span class="micro">Now</span>
-		<div>
+	<section>
+		<div class="widget-head"><h2>Now</h2></div>
+		<div class="card body">
 			{#each now as item (item.id)}
 				<ItemRow {item} />
 			{/each}
@@ -20,13 +20,7 @@
 {/if}
 
 <style>
-	.card {
-		background: var(--card);
-		border-radius: var(--radius-lg);
-		padding: 16px 20px;
-		box-shadow: var(--shadow-sm);
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
+	.body {
+		padding: 8px 20px;
 	}
 </style>

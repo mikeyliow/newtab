@@ -2,6 +2,8 @@
 
 A private, single-page life dashboard: tasks, reading/listening queue, calories, focus — edited in the browser or by agents over MCP. One SvelteKit server on Railway, SQLite on a volume, no external DB.
 
+**Docs:** [architecture & flows](docs/architecture.md) · [API + MCP reference](docs/api.md)
+
 ## Architecture
 
 Everything writes through one **shared core** ([src/lib/server/core.ts](src/lib/server/core.ts)). Two doors into it:
@@ -41,7 +43,7 @@ url:    https://<your-domain>/mcp
 auth:   Authorization: Bearer <MCP_KEY>
 ```
 
-Tools: `get_dashboard`, `list_items`, `add_item`, `complete_item`, `update_item`, `remove_item`, `log_meal`, `list_meals`, `log_spend`, `list_spend`, `set_focus`, `set_targets`, `set_shortcut`, `list_shortcuts`, `remove_shortcut`.
+All 15 tools (items, meals, spending, focus, targets, shortcuts) are listed with arguments in [docs/api.md](docs/api.md).
 
 ## Backup
 

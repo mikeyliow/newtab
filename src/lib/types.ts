@@ -59,6 +59,8 @@ export interface Widget {
 
 export interface Config {
 	focus: string;
+	name: string;
+	wallpaper: string;
 	calorie_target: number | null;
 	budget_month: number | null;
 	shortcuts: Shortcut[];

@@ -226,11 +226,25 @@ export function getConfig(): Config {
 	const row = getDb().prepare('SELECT * FROM config WHERE id = 1').get() as any;
 	return {
 		focus: row.focus,
+		name: row.name,
+		wallpaper: row.wallpaper,
 		calorie_target: row.calorie_target,
 		budget_month: row.budget_month,
 		shortcuts: JSON.parse(row.shortcuts),
 		widgets: JSON.parse(row.widgets)
 	};
+}
+
+export function setName(text: string): Config {
+	if (typeof text !== 'string' || !text.trim()) throw new CoreError('name cannot be empty');
+	getDb().prepare('UPDATE config SET name = ? WHERE id = 1').run(text.trim());
+	return getConfig();
+}
+
+export function setWallpaper(url: string): Config {
+	if (typeof url !== 'string') throw new CoreError('wallpaper must be a string (url, or empty to clear)');
+	getDb().prepare('UPDATE config SET wallpaper = ? WHERE id = 1').run(url.trim());
+	return getConfig();
 }
 
 export function setFocus(text: string): Config {

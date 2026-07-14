@@ -35,84 +35,81 @@
 	}
 </script>
 
-<section class="card">
-	<header>
-		<span class="micro">Calories today</span>
-		<button class="ghost" onclick={() => (adding = !adding)} aria-label="log meal">
-			<Plus size={16} />
+<section>
+	<div class="widget-head">
+		<h2>Calories today</h2>
+		<button class="soft push" onclick={() => (adding = !adding)}>
+			<Plus size={14} /> Log
 		</button>
-	</header>
-
-	<div class="metrics">
-		<div class="metric main">
-			<span class="value">{totals.kcal}</span>
-			<span class="micro">{target ? `/ ${target} kcal` : 'kcal'}</span>
-		</div>
-		<div class="metric">
-			<span class="value">{Math.round(totals.p)}g</span>
-			<span class="micro">Protein</span>
-		</div>
-		<div class="metric">
-			<span class="value">{Math.round(totals.c)}g</span>
-			<span class="micro">Carbs</span>
-		</div>
-		<div class="metric">
-			<span class="value">{Math.round(totals.f)}g</span>
-			<span class="micro">Fat</span>
-		</div>
 	</div>
 
-	{#if target}
-		<div class="bar" role="progressbar" aria-valuenow={totals.kcal} aria-valuemax={target}>
-			<div class="fill" style:width="{Math.min(100, (totals.kcal / target) * 100)}%"></div>
+	<div class="card body">
+		<div class="metrics">
+			<div class="metric main">
+				<span class="value">{totals.kcal}</span>
+				<span class="micro">{target ? `/ ${target} kcal` : 'kcal'}</span>
+			</div>
+			<div class="metric">
+				<span class="value">{Math.round(totals.p)}g</span>
+				<span class="micro">Protein</span>
+			</div>
+			<div class="metric">
+				<span class="value">{Math.round(totals.c)}g</span>
+				<span class="micro">Carbs</span>
+			</div>
+			<div class="metric">
+				<span class="value">{Math.round(totals.f)}g</span>
+				<span class="micro">Fat</span>
+			</div>
 		</div>
-	{/if}
 
-	{#if adding}
-		<form onsubmit={add}>
-			<!-- svelte-ignore a11y_autofocus -->
-			<input class="grow" bind:value={name} placeholder="what did you eat?" autofocus />
-			<input type="number" bind:value={kcal} placeholder="kcal" min="0" required />
-			<input type="number" bind:value={p} placeholder="P" min="0" />
-			<input type="number" bind:value={c} placeholder="C" min="0" />
-			<input type="number" bind:value={f} placeholder="F" min="0" />
-			<button class="pill" type="submit" disabled={saving}>Log</button>
-		</form>
-	{/if}
+		{#if target}
+			<div class="bar" role="progressbar" aria-valuenow={totals.kcal} aria-valuemax={target}>
+				<div class="fill" style:width="{Math.min(100, (totals.kcal / target) * 100)}%"></div>
+			</div>
+		{/if}
 
-	{#if meals.length}
-		<ul>
-			{#each meals as meal (meal.id)}
-				<li>
-					<span class="meal-name">{meal.name}</span>
-					<span class="meal-kcal">{meal.kcal} kcal</span>
-					<button class="ghost" onclick={() => api.removeMeal(meal.id)} aria-label="remove meal">
-						<X size={13} />
-					</button>
-				</li>
-			{/each}
-		</ul>
-	{/if}
+		{#if adding}
+			<form onsubmit={add}>
+				<!-- svelte-ignore a11y_autofocus -->
+				<input class="grow" bind:value={name} placeholder="what did you eat?" autofocus />
+				<input type="number" bind:value={kcal} placeholder="kcal" min="0" required />
+				<input type="number" bind:value={p} placeholder="P" min="0" />
+				<input type="number" bind:value={c} placeholder="C" min="0" />
+				<input type="number" bind:value={f} placeholder="F" min="0" />
+				<button class="pill" type="submit" disabled={saving}>Log</button>
+			</form>
+		{/if}
+
+		{#if meals.length}
+			<ul>
+				{#each meals as meal (meal.id)}
+					<li>
+						<span class="meal-name">{meal.name}</span>
+						<span class="meal-kcal">{meal.kcal} kcal</span>
+						<button class="ghost" onclick={() => api.removeMeal(meal.id)} aria-label="remove meal">
+							<X size={13} />
+						</button>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
 </section>
 
 <style>
-	.card {
-		background: var(--card);
-		border-radius: var(--radius-lg);
-		padding: 16px 20px;
-		box-shadow: var(--shadow-sm);
+	.push {
+		margin-left: auto;
+	}
+	.body {
+		padding: 18px 20px;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
 	}
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
 	.metrics {
 		display: flex;
-		gap: 28px;
+		gap: 32px;
 		flex-wrap: wrap;
 	}
 	.metric {
@@ -142,6 +139,9 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
+		background: var(--muted);
+		padding: 12px;
+		border-radius: var(--radius-md);
 	}
 	form input {
 		font-size: 14px;
@@ -167,6 +167,10 @@
 		gap: 8px;
 		padding: 4px 0;
 		font-size: 14px;
+		border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+	}
+	li:last-child {
+		border-bottom: none;
 	}
 	li .ghost {
 		opacity: 0;

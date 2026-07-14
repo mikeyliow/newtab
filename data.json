@@ -1,6 +1,8 @@
 {
 	"config": {
 		"focus": "Ship the newtab dashboard.",
+		"name": "Mikey",
+		"wallpaper": "",
 		"calorie_target": null,
 		"budget_month": null,
 		"shortcuts": [

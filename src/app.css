@@ -1,19 +1,19 @@
 /* titan design tokens — warm minimal monochrome (design-styles/titan) */
 :root {
-	--background: #ffffff;
+	--background: #f3f0eb;
 	--foreground: #111111;
-	--card: #f3efeb;
+	--card: #ffffff;
 	--card-foreground: #111111;
 	--primary: #111111;
 	--primary-foreground: #ffffff;
 	--muted: #f3efeb;
 	--muted-foreground: #615e5b;
 	--muted-2: #8a8a87;
-	--accent: #d8d3cc;
+	--accent: #eae5df;
 	--accent-foreground: #111111;
 	--destructive: #b3261e;
 	--destructive-foreground: #ffffff;
-	--border: #d8d3cc;
+	--border: #e3ded7;
 	--input: #d8d3cc;
 	--ring: #111111;
 	--chart-1: #111111;
@@ -25,10 +25,10 @@
 	--font-mono: 'Geist Mono Variable', 'Geist Mono', 'SF Mono', Monaco, ui-monospace, monospace;
 	--radius-sm: 8px;
 	--radius-md: 12px;
-	--radius-lg: 20px;
+	--radius-lg: 16px;
 	--radius-pill: 9999px;
-	--shadow-sm: 0px 2px 6px 0px hsl(0 0% 0% / 0.06);
-	--shadow: 0px 4px 12px 0px hsl(0 0% 0% / 0.08);
+	--shadow-sm: 0px 2px 6px 0px hsl(0 0% 0% / 0.04);
+	--shadow: 0px 4px 12px 0px hsl(0 0% 0% / 0.06);
 	--shadow-md: 0px 6px 18px 0px hsl(0 0% 0% / 0.08);
 	--tracking-tight: -0.03em;
 }
@@ -85,6 +85,25 @@ a {
 	color: inherit;
 }
 
+/* white card on the warm background — the building block of the screen */
+.card {
+	background: var(--card);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+}
+
+/* widget heading row: title on the left, actions on the right */
+.widget-head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 10px;
+}
+.widget-head h2 {
+	font-size: 19px;
+}
+
 /* geist mono uppercase micro-label — the signature eyebrow */
 .micro {
 	font-family: var(--font-mono);
@@ -114,6 +133,25 @@ a {
 	cursor: default;
 }
 
+/* quiet secondary button (like the "Refresh" / "+ Add" in the reference) */
+.soft {
+	font-family: var(--font-sans);
+	font-size: 13px;
+	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--card);
+	color: var(--foreground);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 6px 12px;
+	cursor: pointer;
+}
+.soft:hover {
+	background: var(--accent);
+}
+
 /* quiet icon button */
 .ghost {
 	background: none;
@@ -134,7 +172,7 @@ input,
 select {
 	font: inherit;
 	color: var(--foreground);
-	background: var(--background);
+	background: var(--card);
 	border: 1px solid var(--input);
 	border-radius: var(--radius-md);
 	padding: 8px 12px;

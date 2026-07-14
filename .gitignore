@@ -24,3 +24,6 @@ vite.config.ts.timestamp-*
 
 # Local SQLite (live data lives on the Railway volume)
 /data
+
+# Claude Code local state
+.claude/settings.local.json

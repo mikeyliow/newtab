@@ -18,78 +18,120 @@
 		if (browser) localStorage.setItem('newtab:privacy', privacy ? '1' : '0');
 	});
 
-	const now = new Date();
-	const greeting =
-		now.getHours() < 5 ? 'Up late' : now.getHours() < 12 ? 'Good morning' : now.getHours() < 18 ? 'Good afternoon' : 'Good evening';
-	const dateLine = now.toLocaleDateString('en-GB', {
-		weekday: 'long',
-		day: 'numeric',
-		month: 'long'
+	// live clock, minute resolution
+	let now = $state(new Date());
+	$effect(() => {
+		const t = setInterval(() => (now = new Date()), 10_000);
+		return () => clearInterval(t);
 	});
+	const clock = $derived(
+		now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+	);
+	const greeting = $derived(
+		now.getHours() < 5 ? 'Up late' : now.getHours() < 12 ? 'Good morning' : now.getHours() < 18 ? 'Good afternoon' : 'Good evening'
+	);
+	const dateLine = $derived(
+		now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+	);
 
-	const visibleWidgets = $derived(
+	// widgets split into the main column and the right sidebar, both config-ordered
+	const SIDEBAR = ['shortcuts', 'budget'];
+	const visible = $derived(
 		[...dash.config.widgets].sort((a, b) => a.order - b.order).filter((w) => w.visible)
 	);
+	const mainWidgets = $derived(visible.filter((w) => !SIDEBAR.includes(w.id)));
+	const sideWidgets = $derived(visible.filter((w) => SIDEBAR.includes(w.id)));
 </script>
 
 <svelte:head><title>newtab</title></svelte:head>
 
-<main>
-	<header class="top">
-		<div>
-			<span class="micro">{dateLine}</span>
-			<h1>{greeting}, Mikey.</h1>
-		</div>
-		<div class="top-actions">
-			<button
-				class="ghost"
-				onclick={() => (privacy = !privacy)}
-				aria-label="toggle privacy mode"
-				title={privacy ? 'show private widgets' : 'privacy mode'}
-			>
-				{#if privacy}<EyeOff size={18} />{:else}<Eye size={18} />{/if}
-			</button>
-			<button
-				class="ghost"
-				onclick={() => (showSettings = !showSettings)}
-				aria-label="settings"
-				title="settings"
-			>
-				<Settings2 size={18} />
-			</button>
-		</div>
-	</header>
+<div
+	class="page"
+	class:has-wallpaper={!!dash.config.wallpaper}
+	style:background-image={dash.config.wallpaper ? `url(${dash.config.wallpaper})` : undefined}
+>
+	<main>
+		<header class="top">
+			<div>
+				<span class="micro">{dateLine}</span>
+				<h1>{greeting}, {dash.config.name}.</h1>
+			</div>
+			<div class="top-actions">
+				<span class="clock">{clock}</span>
+				<button
+					class="ghost"
+					onclick={() => (privacy = !privacy)}
+					aria-label="toggle privacy mode"
+					title={privacy ? 'show private widgets' : 'privacy mode'}
+				>
+					{#if privacy}<EyeOff size={18} />{:else}<Eye size={18} />{/if}
+				</button>
+				<button
+					class="ghost"
+					onclick={() => (showSettings = !showSettings)}
+					aria-label="settings"
+					title="settings"
+				>
+					<Settings2 size={18} />
+				</button>
+			</div>
+		</header>
 
-	{#if showSettings}
-		<SettingsPanel config={dash.config} onclose={() => (showSettings = false)} />
-	{/if}
+		{#if showSettings}
+			<SettingsPanel config={dash.config} onclose={() => (showSettings = false)} />
+		{/if}
 
-	{#each visibleWidgets as widget (widget.id)}
-		<div class:sensitive-blur={privacy && widget.sensitive}>
-			{#if widget.id === 'focus'}
-				<FocusWidget focus={dash.config.focus} />
-			{:else if widget.id === 'now'}
-				<NowWidget items={dash.items} />
-			{:else if widget.id === 'items'}
-				<ItemsWidget items={dash.items} />
-			{:else if widget.id === 'calories'}
-				<CaloriesWidget meals={dash.meals} totals={dash.meal_totals} target={dash.config.calorie_target} />
-			{:else if widget.id === 'shortcuts'}
-				<ShortcutsWidget shortcuts={dash.config.shortcuts} />
-			{/if}
-			<!-- budget widget parked for v1 -->
+		<div class="grid">
+			<div class="col main-col">
+				{#each mainWidgets as widget (widget.id)}
+					<div class:sensitive-blur={privacy && widget.sensitive}>
+						{#if widget.id === 'focus'}
+							<FocusWidget focus={dash.config.focus} />
+						{:else if widget.id === 'now'}
+							<NowWidget items={dash.items} />
+						{:else if widget.id === 'items'}
+							<ItemsWidget items={dash.items} />
+						{:else if widget.id === 'calories'}
+							<CaloriesWidget meals={dash.meals} totals={dash.meal_totals} target={dash.config.calorie_target} />
+						{/if}
+					</div>
+				{/each}
+			</div>
+			<div class="col side-col">
+				{#each sideWidgets as widget (widget.id)}
+					<div class:sensitive-blur={privacy && widget.sensitive}>
+						{#if widget.id === 'shortcuts'}
+							<ShortcutsWidget shortcuts={dash.config.shortcuts} />
+						{/if}
+						<!-- budget widget parked for v1 -->
+					</div>
+				{/each}
+			</div>
 		</div>
-	{/each}
-</main>
+	</main>
+</div>
 
 <style>
+	.page {
+		min-height: 100dvh;
+		background-size: cover;
+		background-position: center;
+		background-attachment: fixed;
+	}
+	/* keep bare text legible on top of a photo */
+	.has-wallpaper :global(h1),
+	.has-wallpaper :global(h2),
+	.has-wallpaper :global(.micro),
+	.has-wallpaper .clock {
+		text-shadow: 0 1px 12px color-mix(in srgb, var(--background) 70%, transparent);
+	}
 	main {
-		max-width: 680px;
+		max-width: 1280px;
 		margin: 0 auto;
-		padding: 48px 24px 96px;
+		padding: 44px 48px 96px;
 		display: flex;
 		flex-direction: column;
-		gap: 32px;
+		gap: 36px;
 	}
 	.top {
 		display: flex;
@@ -97,12 +139,44 @@
 		justify-content: space-between;
 	}
 	h1 {
-		font-size: 36px;
+		font-size: 44px;
+		letter-spacing: -1.3px;
 		margin-top: 2px;
 	}
 	.top-actions {
 		display: flex;
-		gap: 4px;
-		padding-top: 6px;
+		align-items: center;
+		gap: 8px;
+		padding-top: 4px;
+	}
+	.clock {
+		font-family: var(--font-mono);
+		font-size: 14px;
+		color: var(--muted-foreground);
+		margin-right: 4px;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 340px;
+		gap: 48px;
+		align-items: start;
+	}
+	.col {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+		min-width: 0;
+	}
+	@media (max-width: 960px) {
+		main {
+			padding: 32px 20px 80px;
+		}
+		h1 {
+			font-size: 32px;
+		}
+		.grid {
+			grid-template-columns: 1fr;
+			gap: 32px;
+		}
 	}
 </style>
