@@ -36,7 +36,7 @@
 		return () => clearInterval(t);
 	});
 	const clock = $derived(
-		now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+		now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
 	);
 	const PhaseIcon = $derived.by(() => {
 		const h = now.getHours();
@@ -77,34 +77,7 @@
 				<h1>{greeting}, {dash.config.name}.</h1>
 			</div>
 			<div class="top-right">
-				<div class="clock-row">
-					<span class="clock"><PhaseIcon size={20} aria-hidden="true" />{clock}</span>
-					<span class="divider"></span>
-					<button
-						class="ghost"
-						onclick={() => (dark = !dark)}
-						aria-label="toggle theme"
-						title={dark ? 'light mode' : 'dark mode'}
-					>
-						{#if dark}<Sun size={18} />{:else}<Moon size={18} />{/if}
-					</button>
-					<button
-						class="ghost"
-						onclick={() => (privacy = !privacy)}
-						aria-label="toggle privacy mode"
-						title={privacy ? 'show private widgets' : 'privacy mode'}
-					>
-						{#if privacy}<EyeOff size={18} />{:else}<Eye size={18} />{/if}
-					</button>
-					<button
-						class="ghost"
-						onclick={() => (showSettings = !showSettings)}
-						aria-label="settings"
-						title="settings"
-					>
-						<Settings2 size={18} />
-					</button>
-				</div>
+				<span class="clock"><PhaseIcon size={24} aria-hidden="true" />{clock}</span>
 				<div class="status-row">
 					<StatusLines {now} />
 				</div>
@@ -143,6 +116,33 @@
 			</div>
 		</div>
 	</main>
+
+	<div class="corner">
+		<button
+			class="ghost"
+			onclick={() => (dark = !dark)}
+			aria-label="toggle theme"
+			title={dark ? 'light mode' : 'dark mode'}
+		>
+			{#if dark}<Sun size={17} />{:else}<Moon size={17} />{/if}
+		</button>
+		<button
+			class="ghost"
+			onclick={() => (privacy = !privacy)}
+			aria-label="toggle privacy mode"
+			title={privacy ? 'show private widgets' : 'privacy mode'}
+		>
+			{#if privacy}<EyeOff size={17} />{:else}<Eye size={17} />{/if}
+		</button>
+		<button
+			class="ghost"
+			onclick={() => (showSettings = !showSettings)}
+			aria-label="settings"
+			title="settings"
+		>
+			<Settings2 size={17} />
+		</button>
+	</div>
 </div>
 
 <style>
@@ -185,33 +185,41 @@
 		padding-top: 4px;
 		flex: none;
 	}
-	.clock-row {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-	}
 	.clock {
 		display: inline-flex;
 		align-items: center;
-		gap: 10px;
+		gap: 12px;
 		font-family: var(--font-mono);
-		font-size: 26px;
+		font-size: 40px;
 		font-weight: 500;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.03em;
+		line-height: 1;
 	}
 	.clock :global(svg) {
 		color: var(--muted-foreground);
-	}
-	.divider {
-		width: 1px;
-		height: 18px;
-		background: var(--border);
-		margin: 0 6px;
 	}
 	.status-row {
 		display: flex;
 		align-items: center;
 		gap: 16px;
+	}
+	.corner {
+		position: fixed;
+		right: 18px;
+		bottom: 16px;
+		display: flex;
+		gap: 4px;
+		padding: 4px;
+		border-radius: var(--radius-pill);
+		background: color-mix(in srgb, var(--card) 72%, transparent);
+		backdrop-filter: blur(8px);
+		opacity: 0.55;
+		transition: opacity 0.2s ease;
+		z-index: 30;
+	}
+	.corner:hover,
+	.corner:focus-within {
+		opacity: 1;
 	}
 	.grid {
 		display: grid;
