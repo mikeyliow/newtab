@@ -40,7 +40,11 @@
 	const visible = $derived(
 		[...dash.config.widgets].sort((a, b) => a.order - b.order).filter((w) => w.visible)
 	);
-	const mainWidgets = $derived(visible.filter((w) => MAIN.includes(w.id)));
+	// an empty Now must not render a wrapper at all — the column gap would push Items down
+	const hasNow = $derived(dash.items.some((i) => i.status === 'open' && (i.flagged || i.kind === 'do')));
+	const mainWidgets = $derived(
+		visible.filter((w) => MAIN.includes(w.id)).filter((w) => w.id !== 'now' || hasNow)
+	);
 	const sideWidgets = $derived(visible.filter((w) => SIDEBAR.includes(w.id)));
 </script>
 

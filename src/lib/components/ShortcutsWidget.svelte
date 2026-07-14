@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Shortcut } from '$lib/types';
 	import { api } from '$lib/client/api';
-	import { Plus, X, Globe } from '@lucide/svelte';
+	import { Plus, X, Globe, GripVertical } from '@lucide/svelte';
 
 	let { shortcuts }: { shortcuts: Shortcut[] } = $props();
 
@@ -10,6 +10,24 @@
 	let url = $state('');
 	let saving = $state(false);
 	let broken = $state<Record<string, boolean>>({});
+
+	// drag to rearrange (HTML5 dnd), persisted through the same config patch as everything else
+	let dragIdx = $state<number | null>(null);
+	let overIdx = $state<number | null>(null);
+
+	function resetDrag() {
+		dragIdx = null;
+		overIdx = null;
+	}
+
+	async function drop() {
+		if (dragIdx === null || overIdx === null || dragIdx === overIdx) return resetDrag();
+		const next = [...shortcuts];
+		const [moved] = next.splice(dragIdx, 1);
+		next.splice(overIdx, 0, moved);
+		resetDrag();
+		await api.patchConfig({ shortcuts: next });
+	}
 
 	function favicon(u: string): string | null {
 		try {
@@ -58,20 +76,44 @@
 		</form>
 	{/if}
 
-	<div class="list">
-		{#each shortcuts as s (s.id)}
-			<div class="card row">
+	<div class="list" role="list">
+		{#each shortcuts as s, i (s.id)}
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+			<div
+				class="card row"
+				class:dragging={dragIdx === i}
+				class:drag-over={overIdx === i && dragIdx !== null && dragIdx !== i}
+				role="listitem"
+				draggable="true"
+				ondragstart={(e) => {
+					dragIdx = i;
+					if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+				}}
+				ondragover={(e) => {
+					e.preventDefault();
+					overIdx = i;
+				}}
+				ondragleave={() => {
+					if (overIdx === i) overIdx = null;
+				}}
+				ondrop={(e) => {
+					e.preventDefault();
+					drop();
+				}}
+				ondragend={resetDrag}
+			>
+				<span class="grip" aria-hidden="true"><GripVertical size={14} /></span>
 				<a href={s.url} class="link">
 					{#if favicon(s.url) && !broken[s.id]}
 						<img
 							src={favicon(s.url)}
 							alt=""
-							width="22"
-							height="22"
+							width="20"
+							height="20"
 							onerror={() => (broken = { ...broken, [s.id]: true })}
 						/>
 					{:else}
-						<Globe size={20} aria-hidden="true" />
+						<Globe size={18} aria-hidden="true" />
 					{/if}
 					<span class="label">{s.label}</span>
 				</a>
@@ -93,8 +135,8 @@
 	form {
 		display: flex;
 		gap: 8px;
-		padding: 12px;
-		margin-bottom: 12px;
+		padding: 10px;
+		margin-bottom: 10px;
 	}
 	form input {
 		font-size: 14px;
@@ -105,29 +147,47 @@
 	.list {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 8px;
 	}
 	.row {
 		display: flex;
 		align-items: center;
+		cursor: grab;
 	}
 	.row:hover {
 		box-shadow: var(--shadow);
+	}
+	.row.dragging {
+		opacity: 0.45;
+	}
+	.row.drag-over {
+		border-color: var(--foreground);
+	}
+	.grip {
+		display: inline-flex;
+		color: var(--muted-2);
+		padding-left: 6px;
+		opacity: 0;
+		flex: none;
+	}
+	.row:hover .grip {
+		opacity: 1;
 	}
 	.link {
 		flex: 1;
 		display: flex;
 		align-items: center;
-		gap: 14px;
-		padding: 16px 18px;
+		gap: 11px;
+		padding: 10px 10px 10px 4px;
 		text-decoration: none;
+		font-size: 14.5px;
 		font-weight: 500;
 		min-width: 0;
 	}
 	.link :global(svg),
 	.link img {
 		flex: none;
-		border-radius: 5px;
+		border-radius: 4px;
 		color: var(--muted-foreground);
 	}
 	.label {
@@ -136,7 +196,7 @@
 		white-space: nowrap;
 	}
 	.remove {
-		margin-right: 12px;
+		margin-right: 8px;
 		opacity: 0;
 	}
 	.row:hover .remove {
