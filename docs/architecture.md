@@ -51,7 +51,8 @@ Plus **config** — a single row (`id = 1`): greeting name, wallpaper url, calor
 Single page, one glance — no sub-pages or tabs. Desktop is a two-column grid (main column + 340px sidebar), collapsing to one column under 960px.
 
 - **Widget config drives the layout**: `config.widgets` is `[{id, visible, order, sensitive}]`. Settings toggles visibility and reorders — no code change. Shortcuts (and budget, later) render in the sidebar; now/items/calories in the main column; both respect the config order. Unknown ids are ignored.
-- **Item rows** are flat and compact (no kind headers) — the coloured kind icon carries that signal — sorted do → think → queue, flagged first within each kind. Each row has a dropdown menu (mark done / pin / open link / delete) instead of a checkbox.
+- **Item rows** are flat and compact (no kind headers) — the coloured kind icon carries that signal — sorted do → think → queue, flagged first within each kind. Each row has a dropdown menu (mark done / pin / open link / delete) instead of a checkbox. A multi-select context filter (work/heirlight/content/personal/untagged) persists per device in `localStorage`, like privacy mode.
+- **Calories** renders as a compact sidebar card below shortcuts: kcal total (+ progress bar when a target is set) and three macro mini-bars coloured per macro, filled by each macro's share of calories (4/4/9 kcal per gram).
 - **Now strip** = open `do` items + anything flagged, derived client-side.
 - **Privacy mode** (eye icon) blurs every widget with `sensitive: true` — for screen-sharing. Persisted per device in `localStorage`, not in config.
 - **Mutations**: components call `src/lib/client/api.ts` (fetch → `invalidateAll()`), so the page reloads its data after every write. No client cache to drift.

@@ -35,8 +35,8 @@
 	);
 
 	// widgets split into the main column and the right sidebar, both config-ordered
-	const MAIN = ['now', 'items', 'calories'];
-	const SIDEBAR = ['shortcuts', 'budget'];
+	const MAIN = ['now', 'items'];
+	const SIDEBAR = ['shortcuts', 'calories', 'budget'];
 	const visible = $derived(
 		[...dash.config.widgets].sort((a, b) => a.order - b.order).filter((w) => w.visible)
 	);
@@ -93,8 +93,6 @@
 							<NowWidget items={dash.items} />
 						{:else if widget.id === 'items'}
 							<ItemsWidget items={dash.items} />
-						{:else if widget.id === 'calories'}
-							<CaloriesWidget meals={dash.meals} totals={dash.meal_totals} target={dash.config.calorie_target} />
 						{/if}
 					</div>
 				{/each}
@@ -104,6 +102,8 @@
 					<div class:sensitive-blur={privacy && widget.sensitive}>
 						{#if widget.id === 'shortcuts'}
 							<ShortcutsWidget shortcuts={dash.config.shortcuts} />
+						{:else if widget.id === 'calories'}
+							<CaloriesWidget meals={dash.meals} totals={dash.meal_totals} target={dash.config.calorie_target} />
 						{/if}
 						<!-- budget widget parked for v1 -->
 					</div>
