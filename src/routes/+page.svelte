@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import FocusWidget from '$lib/components/FocusWidget.svelte';
+	import ProgressWidget from '$lib/components/ProgressWidget.svelte';
 	import ItemsWidget from '$lib/components/ItemsWidget.svelte';
 	import CaloriesWidget from '$lib/components/CaloriesWidget.svelte';
 	import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
@@ -35,7 +36,7 @@
 	);
 
 	// widgets split into the main column and the right sidebar, both config-ordered
-	const MAIN = ['focus', 'items'];
+	const MAIN = ['progress', 'focus', 'items'];
 	const SIDEBAR = ['shortcuts', 'calories', 'budget'];
 	const visible = $derived(
 		[...dash.config.widgets].sort((a, b) => a.order - b.order).filter((w) => w.visible)
@@ -89,7 +90,9 @@
 			<div class="col main-col">
 				{#each mainWidgets as widget (widget.id)}
 					<div class:sensitive-blur={privacy && widget.sensitive}>
-						{#if widget.id === 'focus'}
+						{#if widget.id === 'progress'}
+							<ProgressWidget />
+						{:else if widget.id === 'focus'}
 							<FocusWidget focus={dash.config.focus} />
 						{:else if widget.id === 'items'}
 							<ItemsWidget items={dash.items} />

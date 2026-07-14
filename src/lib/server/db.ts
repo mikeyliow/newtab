@@ -118,9 +118,10 @@ function seedIfEmpty(db: Database.Database) {
 }
 
 export const DEFAULT_WIDGETS = [
-	{ id: 'focus', visible: true, order: 1, sensitive: false },
-	{ id: 'items', visible: true, order: 2, sensitive: false },
-	{ id: 'shortcuts', visible: true, order: 3, sensitive: false },
-	{ id: 'calories', visible: true, order: 4, sensitive: true },
-	{ id: 'budget', visible: false, order: 5, sensitive: true }
+	{ id: 'progress', visible: true, order: 1, sensitive: false },
+	{ id: 'focus', visible: true, order: 2, sensitive: false },
+	{ id: 'items', visible: true, order: 3, sensitive: false },
+	{ id: 'shortcuts', visible: true, order: 4, sensitive: false },
+	{ id: 'calories', visible: false, order: 5, sensitive: true },
+	{ id: 'budget', visible: false, order: 6, sensitive: true }
 ];
