@@ -1,19 +1,19 @@
 /* titan design tokens — warm minimal monochrome (design-styles/titan) */
 :root {
-	--background: #f3f0eb;
+	--background: #faf9f6;
 	--foreground: #111111;
 	--card: #ffffff;
 	--card-foreground: #111111;
 	--primary: #111111;
 	--primary-foreground: #ffffff;
-	--muted: #f3efeb;
+	--muted: #f5f2ee;
 	--muted-foreground: #615e5b;
 	--muted-2: #8a8a87;
-	--accent: #eae5df;
+	--accent: #efeae3;
 	--accent-foreground: #111111;
 	--destructive: #b3261e;
 	--destructive-foreground: #ffffff;
-	--border: #e3ded7;
+	--border: #e9e4dd;
 	--input: #d8d3cc;
 	--ring: #111111;
 	--chart-1: #111111;
