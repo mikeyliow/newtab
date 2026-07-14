@@ -1,42 +1,57 @@
-# sv
+# newtab
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A private, single-page life dashboard: tasks, reading/listening queue, calories, focus — edited in the browser or by agents over MCP. One SvelteKit server on Railway, SQLite on a volume, no external DB.
 
-## Creating a project
+## Architecture
 
-If you're seeing this, you've probably already done this step. Congrats!
+Everything writes through one **shared core** ([src/lib/server/core.ts](src/lib/server/core.ts)). Two doors into it:
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- **Browser** — `POST /login` with a passcode sets a signed JWT cookie; the page and `/api/*` require it.
+- **Agents** — `POST /mcp` (Streamable HTTP MCP server) with `Authorization: Bearer <MCP_KEY>`. The bearer key also works on `/api/*`.
 
-To recreate this project with the same configuration:
+Data lives in SQLite (`better-sqlite3`), migrated on boot. [data.json](data.json) is only a first-run seed — live truth is the DB.
 
-```sh
-# recreate this project
-npx sv@0.16.3 create --template minimal --types ts --install npm scaffold
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Run locally
 
 ```sh
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+Dev fallbacks: passcode `dev`, bearer key `dev-mcp-key`. DB at `./data/newtab.db` (gitignored).
 
-To create a production version of your app:
+## Deploy (Railway)
 
-```sh
-npm run build
+1. Push this repo to a private GitHub repo, create a Railway service from it.
+2. Add a **volume mounted at `/data`**.
+3. Set env variables:
+   - `PASSCODE` — your login passcode
+   - `JWT_SECRET` — long random string (`openssl rand -hex 32`)
+   - `MCP_KEY` — long random bearer token (`openssl rand -hex 32`)
+   - `DATABASE_PATH=/data/newtab.db`
+   - `TZ=Asia/Kuala_Lumpur`
+4. Deploy. Health check at `/health`.
+
+## MCP
+
+Point any MCP client (Cowork, Claude Code, …) at:
+
+```
+url:    https://<your-domain>/mcp
+auth:   Authorization: Bearer <MCP_KEY>
 ```
 
-You can preview the production build with `npm run preview`.
+Tools: `get_dashboard`, `list_items`, `add_item`, `complete_item`, `update_item`, `remove_item`, `log_meal`, `list_meals`, `log_spend`, `list_spend`, `set_focus`, `set_targets`, `set_shortcut`, `list_shortcuts`, `remove_shortcut`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Backup
+
+`GET /api/export` (bearer-auth'd) returns the whole DB as JSON. [scripts/backup.sh](scripts/backup.sh) curls it into `mkyos` and commits — run it nightly via cron/launchd.
+
+## Data model
+
+- **items** — things you check off. `kind` = `do` (act now) · `think` (mull/decide) · `queue` (consume; has `medium` read/listen/watch). Optional `context` = work · heirlight · content · personal. No due dates — urgency is the kind.
+- **meals** — freeform calorie log (kcal + protein/carbs/fat).
+- **spending** — schema ready, widget parked for v1.
+- **config** — focus line, calorie target, shortcuts, widget layout (show/hide/reorder from Settings; `sensitive` widgets blur in privacy mode).
+
+Design system: **titan** (warm minimal monochrome, Geist + Geist Mono) — tokens in [src/app.css](src/app.css), theme follows the system (light/dark).
