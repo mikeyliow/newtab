@@ -44,7 +44,39 @@
 	--macro-c: #c99a2e;
 	--macro-f: #c76f8a;
 }
-/* theme: light only, by choice */
+/* theme: light by default; .dark on <html> via the header toggle (persisted per device) */
+.dark {
+	--background: #131312;
+	--foreground: #f3efeb;
+	--card: #1c1b1a;
+	--card-foreground: #f3efeb;
+	--primary: #f3efeb;
+	--primary-foreground: #111111;
+	--muted: #242322;
+	--muted-foreground: #a8a49e;
+	--muted-2: #7d7a75;
+	--accent: #2e2c2a;
+	--accent-foreground: #f3efeb;
+	--destructive: #ef4444;
+	--border: #2e2c2a;
+	--input: #3a3835;
+	--ring: #f3efeb;
+	--chart-1: #f3efeb;
+	--chart-2: #d8d3cc;
+	--chart-3: #8a8a87;
+	--chart-4: #615e5b;
+	--chart-5: #1f1f1f;
+	--kind-do: #d98a66;
+	--kind-think: #a893dd;
+	--kind-queue: #6fb98e;
+	--ctx-work: #7d9cbd;
+	--ctx-heirlight: #d4ab4d;
+	--ctx-content: #d38ba4;
+	--ctx-personal: #75b294;
+	--macro-p: #6fb98e;
+	--macro-c: #d4ab4d;
+	--macro-f: #d38ba4;
+}
 
 * {
 	box-sizing: border-box;

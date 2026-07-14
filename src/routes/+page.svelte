@@ -7,7 +7,9 @@
 	import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import Background from '$lib/components/Background.svelte';
-	import { Settings2, EyeOff, Eye } from '@lucide/svelte';
+	import StatusLines from '$lib/components/StatusLines.svelte';
+	import { greeting as pickGreeting } from '$lib/greetings';
+	import { Settings2, EyeOff, Eye, Sun, Moon, Sunrise, Sunset } from '@lucide/svelte';
 	import { browser } from '$app/environment';
 
 	let { data }: PageProps = $props();
@@ -19,6 +21,14 @@
 		if (browser) localStorage.setItem('newtab:privacy', privacy ? '1' : '0');
 	});
 
+	// manual light/dark — per device, ignores the system setting
+	let dark = $state(browser && localStorage.getItem('newtab:theme') === 'dark');
+	$effect(() => {
+		if (!browser) return;
+		localStorage.setItem('newtab:theme', dark ? 'dark' : 'light');
+		document.documentElement.classList.toggle('dark', dark);
+	});
+
 	// live clock, minute resolution
 	let now = $state(new Date());
 	$effect(() => {
@@ -28,9 +38,14 @@
 	const clock = $derived(
 		now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 	);
-	const greeting = $derived(
-		now.getHours() < 5 ? 'Up late' : now.getHours() < 12 ? 'Good morning' : now.getHours() < 18 ? 'Good afternoon' : 'Good evening'
-	);
+	const PhaseIcon = $derived.by(() => {
+		const h = now.getHours();
+		if (h >= 5 && h < 9) return Sunrise;
+		if (h < 18) return Sun;
+		if (h < 20) return Sunset;
+		return Moon;
+	});
+	const greeting = pickGreeting(new Date());
 	const dateLine = $derived(
 		now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
 	);
@@ -61,24 +76,38 @@
 				<span class="micro">{dateLine}</span>
 				<h1>{greeting}, {dash.config.name}.</h1>
 			</div>
-			<div class="top-actions">
-				<span class="clock">{clock}</span>
-				<button
-					class="ghost"
-					onclick={() => (privacy = !privacy)}
-					aria-label="toggle privacy mode"
-					title={privacy ? 'show private widgets' : 'privacy mode'}
-				>
-					{#if privacy}<EyeOff size={18} />{:else}<Eye size={18} />{/if}
-				</button>
-				<button
-					class="ghost"
-					onclick={() => (showSettings = !showSettings)}
-					aria-label="settings"
-					title="settings"
-				>
-					<Settings2 size={18} />
-				</button>
+			<div class="top-right">
+				<div class="clock-row">
+					<span class="clock"><PhaseIcon size={20} aria-hidden="true" />{clock}</span>
+					<span class="divider"></span>
+					<button
+						class="ghost"
+						onclick={() => (dark = !dark)}
+						aria-label="toggle theme"
+						title={dark ? 'light mode' : 'dark mode'}
+					>
+						{#if dark}<Sun size={18} />{:else}<Moon size={18} />{/if}
+					</button>
+					<button
+						class="ghost"
+						onclick={() => (privacy = !privacy)}
+						aria-label="toggle privacy mode"
+						title={privacy ? 'show private widgets' : 'privacy mode'}
+					>
+						{#if privacy}<EyeOff size={18} />{:else}<Eye size={18} />{/if}
+					</button>
+					<button
+						class="ghost"
+						onclick={() => (showSettings = !showSettings)}
+						aria-label="settings"
+						title="settings"
+					>
+						<Settings2 size={18} />
+					</button>
+				</div>
+				<div class="status-row">
+					<StatusLines {now} />
+				</div>
 			</div>
 		</header>
 
@@ -95,7 +124,7 @@
 						{:else if widget.id === 'focus'}
 							<FocusWidget focus={dash.config.focus} />
 						{:else if widget.id === 'items'}
-							<ItemsWidget items={dash.items} />
+							<ItemsWidget items={dash.items} doneToday={dash.done_today} />
 						{/if}
 					</div>
 				{/each}
@@ -148,17 +177,41 @@
 		letter-spacing: -1.3px;
 		margin-top: 2px;
 	}
-	.top-actions {
+	.top-right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 6px;
+		padding-top: 4px;
+		flex: none;
+	}
+	.clock-row {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		padding-top: 4px;
+		gap: 6px;
 	}
 	.clock {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
 		font-family: var(--font-mono);
-		font-size: 14px;
+		font-size: 26px;
+		font-weight: 500;
+		letter-spacing: -0.02em;
+	}
+	.clock :global(svg) {
 		color: var(--muted-foreground);
-		margin-right: 4px;
+	}
+	.divider {
+		width: 1px;
+		height: 18px;
+		background: var(--border);
+		margin: 0 6px;
+	}
+	.status-row {
+		display: flex;
+		align-items: center;
+		gap: 16px;
 	}
 	.grid {
 		display: grid;

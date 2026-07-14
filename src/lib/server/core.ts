@@ -314,12 +314,21 @@ export function setWidgets(widgets: Widget[]): Config {
 export function getDashboard() {
 	const config = getConfig();
 	const items = listItems({ status: 'open' });
+	const doneToday = (
+		getDb()
+			.prepare(
+				`SELECT * FROM items WHERE status = 'done'
+				 AND date(completed_at, 'localtime') = date('now', 'localtime')
+				 ORDER BY completed_at DESC`
+			)
+			.all() as any[]
+	).map(rowToItem);
 	const meals = listMeals();
 	const totals = meals.reduce(
 		(acc, m) => ({ kcal: acc.kcal + m.kcal, p: acc.p + m.p, c: acc.c + m.c, f: acc.f + m.f }),
 		{ kcal: 0, p: 0, c: 0, f: 0 }
 	);
-	return { date: todayLocal(), config, items, meals, meal_totals: totals };
+	return { date: todayLocal(), config, items, done_today: doneToday, meals, meal_totals: totals };
 }
 
 // ---- export (backup) ----

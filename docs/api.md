@@ -69,7 +69,7 @@ Notes:
 
 | Tool | Arguments | Does |
 |---|---|---|
-| `get_dashboard` | — | config + open items + today's meals & totals |
+| `get_dashboard` | — | config + open items + items completed today + today's meals & totals |
 | `list_items` | `kind?, context?, status?` | filtered items |
 | `add_item` | `kind, title, context?, url?, medium?, source?, flagged?` | create item |
 | `complete_item` | `id` | mark done |

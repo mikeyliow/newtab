@@ -3,12 +3,31 @@
 	import { KINDS, CONTEXTS, MEDIUMS } from '$lib/types';
 	import { api } from '$lib/client/api';
 	import ItemRow from './ItemRow.svelte';
-	import { Plus, ListFilter, Check } from '@lucide/svelte';
+	import { Plus, ListFilter, Check, RotateCcw } from '@lucide/svelte';
 	import { browser } from '$app/environment';
 	import { slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 
-	let { items }: { items: Item[] } = $props();
+	import { tick } from 'svelte';
+
+	let { items, doneToday = [] }: { items: Item[]; doneToday?: Item[] } = $props();
+	let showDone = $state(false);
+	let titleInput = $state<HTMLInputElement | null>(null);
+
+	async function openAdd() {
+		adding = true;
+		await tick();
+		titleInput?.focus();
+	}
+
+	// quick-add: press "a" anywhere (outside a field) to open the add form
+	function onKeydown(e: KeyboardEvent) {
+		if (e.key !== 'a' || e.metaKey || e.ctrlKey || e.altKey) return;
+		const t = e.target as HTMLElement;
+		if (t.closest('input, textarea, select, [contenteditable]')) return;
+		e.preventDefault();
+		openAdd();
+	}
 
 	// context filter: multi-select, persisted per device
 	const FILTER_KEY = 'newtab:ctx-filter';
@@ -79,7 +98,7 @@
 	}
 </script>
 
-<svelte:window onclick={() => (filterOpen = false)} />
+<svelte:window onclick={() => (filterOpen = false)} onkeydown={onKeydown} />
 
 <section>
 	<div class="widget-head">
@@ -115,7 +134,7 @@
 					</div>
 				{/if}
 			</div>
-			<button class="soft" onclick={() => (adding = !adding)}>
+			<button class="soft" onclick={() => (adding ? (adding = false) : openAdd())}>
 				<Plus size={14} /> Add
 			</button>
 		</div>
@@ -125,7 +144,7 @@
 		{#if adding}
 			<form onsubmit={add}>
 				<!-- svelte-ignore a11y_autofocus -->
-				<input class="grow" bind:value={title} placeholder="what is it?" autofocus />
+				<input class="grow" bind:this={titleInput} bind:value={title} placeholder="what is it?" autofocus />
 				<select bind:value={kind}>
 					{#each KINDS as k (k)}<option value={k}>{kindLabels[k]}</option>{/each}
 				</select>
@@ -152,6 +171,30 @@
 			</div>
 		{/each}
 	</div>
+
+	{#if doneToday.length}
+		<button class="done-line" onclick={() => (showDone = !showDone)}>
+			<Check size={12} strokeWidth={3} />
+			{doneToday.length} done today · {showDone ? 'hide' : 'show'}
+		</button>
+		{#if showDone}
+			<div class="card done-list" transition:slide={{ duration: 180 }}>
+				{#each doneToday as item (item.id)}
+					<div class="done-row">
+						<span class="done-title">{item.title}</span>
+						<button
+							class="ghost"
+							onclick={() => api.updateItem(item.id, { status: 'open' })}
+							aria-label="reopen"
+							title="undo — back to open"
+						>
+							<RotateCcw size={14} />
+						</button>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	{/if}
 </section>
 
 <style>
@@ -256,5 +299,49 @@
 	.empty {
 		color: var(--muted-2);
 		margin: 12px 0;
+	}
+	.done-line {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		align-self: flex-start;
+		margin-top: 10px;
+		background: none;
+		border: none;
+		padding: 0;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--muted-2);
+		cursor: pointer;
+	}
+	.done-line:hover {
+		color: var(--foreground);
+	}
+	.done-list {
+		margin-top: 8px;
+		padding: 6px 20px;
+	}
+	.done-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 8px 0;
+		border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+	}
+	.done-row:last-child {
+		border-bottom: none;
+	}
+	.done-title {
+		font-size: 14px;
+		color: var(--muted-2);
+		text-decoration: line-through;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.done-row .ghost {
+		margin-left: auto;
 	}
 </style>

@@ -71,6 +71,7 @@ export interface Dashboard {
 	date: string;
 	config: Config;
 	items: Item[];
+	done_today: Item[];
 	meals: Meal[];
 	meal_totals: { kcal: number; p: number; c: number; f: number };
 }
