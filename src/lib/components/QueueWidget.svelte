@@ -14,7 +14,7 @@
 
 <section>
 	<div class="widget-head">
-		<h2>Queue</h2>
+		<h2>Reading list</h2>
 		{#if queue.length}<span class="count">{queue.length}</span>{/if}
 	</div>
 	{#if queue.length}
