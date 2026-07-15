@@ -14,11 +14,18 @@
 	import { ICONS } from '$lib/icons';
 	import { Settings2, Sun, Moon, Sunrise, Sunset, Globe } from '@lucide/svelte';
 	import { browser } from '$app/environment';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data }: PageProps = $props();
 	const dash = $derived(data.dashboard);
 
 	let showSettings = $state(false);
+
+	// the service worker may have painted a cached page — silently pull fresh data once
+	$effect(() => {
+		const t = setTimeout(() => invalidateAll(), 600);
+		return () => clearTimeout(t);
+	});
 
 	// manual light/dark — per device, ignores the system setting
 	let dark = $state(browser && localStorage.getItem('newtab:theme') === 'dark');

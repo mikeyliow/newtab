@@ -4,6 +4,23 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<script>
+			// apply the saved theme before first paint — no light flash for dark users
+			try {
+				if (localStorage.getItem('newtab:theme') === 'dark')
+					document.documentElement.classList.add('dark');
+			} catch (e) {
+				/* no localStorage, default light */
+			}
+		</script>
+		<style>
+			html {
+				background: #faf9f6;
+			}
+			html.dark {
+				background: #131312;
+			}
+		</style>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

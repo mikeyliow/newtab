@@ -66,10 +66,22 @@ async function topRaptor(eventId: string): Promise<RaptorsLast['top']> {
 	return best;
 }
 
+let refreshing: Promise<RaptorsInfo | null> | null = null;
+
 export async function getRaptors(): Promise<RaptorsInfo | null> {
 	const cached = cacheGet('raptors');
-	if (cached && cached.age < TTL_MS) return cached.value as RaptorsInfo;
+	// never block a page load on ESPN: serve whatever we have and refresh behind the scenes
+	if (cached) {
+		if (cached.age >= TTL_MS && !refreshing) {
+			refreshing = fetchRaptors().finally(() => (refreshing = null));
+		}
+		return cached.value as RaptorsInfo;
+	}
+	// first ever load: nothing cached yet, fetch inline
+	return fetchRaptors();
+}
 
+async function fetchRaptors(): Promise<RaptorsInfo | null> {
 	try {
 		const res = await fetch(SCHEDULE_URL, { signal: AbortSignal.timeout(4000) });
 		const data = await res.json();
@@ -101,7 +113,7 @@ export async function getRaptors(): Promise<RaptorsInfo | null> {
 		cacheSet('raptors', info);
 		return info;
 	} catch {
-		// ESPN down or shape changed — serve whatever we had, however old
-		return (cached?.value as RaptorsInfo) ?? null;
+		// ESPN down or shape changed — leave the cache as-is and report nothing new
+		return null;
 	}
 }
