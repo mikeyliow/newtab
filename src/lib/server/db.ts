@@ -55,6 +55,12 @@ function migrate(db: Database.Database) {
 			created_at TEXT NOT NULL DEFAULT (datetime('now'))
 		);
 
+		CREATE TABLE IF NOT EXISTS cache (
+			key TEXT PRIMARY KEY,
+			value TEXT NOT NULL,
+			fetched_at INTEGER NOT NULL
+		);
+
 		CREATE TABLE IF NOT EXISTS config (
 			id INTEGER PRIMARY KEY CHECK (id = 1),
 			focus TEXT NOT NULL DEFAULT '',

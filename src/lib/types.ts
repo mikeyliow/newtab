@@ -67,6 +67,20 @@ export interface Config {
 	widgets: Widget[];
 }
 
+export interface RaptorsLast {
+	date: string;
+	opponent: string;
+	home: boolean;
+	win: boolean;
+	score: string;
+	top: { name: string; pts: number; reb: number; ast: number } | null;
+}
+
+export interface RaptorsInfo {
+	next: { date: string; opponent: string; home: boolean } | null;
+	last: RaptorsLast | null;
+}
+
 export interface Dashboard {
 	date: string;
 	config: Config;

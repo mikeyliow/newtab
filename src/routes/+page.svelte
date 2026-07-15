@@ -116,7 +116,7 @@
 						{#if widget.id === 'queue'}
 							<QueueWidget items={dash.items} />
 						{:else if widget.id === 'sports'}
-							<SportsWidget />
+							<SportsWidget raptors={data.raptors} />
 						{:else if widget.id === 'shortcuts'}
 							<ShortcutsWidget shortcuts={dash.config.shortcuts} />
 						{:else if widget.id === 'calories'}
