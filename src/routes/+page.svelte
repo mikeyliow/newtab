@@ -11,17 +11,14 @@
 	import Background from '$lib/components/Background.svelte';
 	import StatusLines from '$lib/components/StatusLines.svelte';
 	import { greeting as pickGreeting } from '$lib/greetings';
-	import { Settings2, EyeOff, Eye, Sun, Moon, Sunrise, Sunset } from '@lucide/svelte';
+	import { ICONS } from '$lib/icons';
+	import { Settings2, Sun, Moon, Sunrise, Sunset, Globe } from '@lucide/svelte';
 	import { browser } from '$app/environment';
 
 	let { data }: PageProps = $props();
 	const dash = $derived(data.dashboard);
 
 	let showSettings = $state(false);
-	let privacy = $state(browser && localStorage.getItem('newtab:privacy') === '1');
-	$effect(() => {
-		if (browser) localStorage.setItem('newtab:privacy', privacy ? '1' : '0');
-	});
 
 	// manual light/dark — per device, ignores the system setting
 	let dark = $state(browser && localStorage.getItem('newtab:theme') === 'dark');
@@ -82,7 +79,15 @@
 				<span class="micro">{dateLine}</span>
 				<h1>{greeting}, {dash.config.name}.</h1>
 				{#if showTagline}
-					<FocusWidget focus={dash.config.focus} />
+					<FocusWidget focus={dash.config.focus} icon={dash.config.focus_icon} />
+				{/if}
+				{#if dash.config.quick_links.length}
+					<nav class="quick">
+						{#each dash.config.quick_links as q (q.url)}
+							{@const QIcon = (q.icon && ICONS[q.icon]) || Globe}
+							<a class="soft" href={q.url}><QIcon size={14} />{q.label}</a>
+						{/each}
+					</nav>
 				{/if}
 			</div>
 			<div class="top-right">
@@ -103,7 +108,7 @@
 		<div class="grid">
 			<div class="col main-col">
 				{#each mainWidgets as widget (widget.id)}
-					<div class:sensitive-blur={privacy && widget.sensitive}>
+					<div>
 						{#if widget.id === 'items'}
 							<ItemsWidget items={dash.items} doneToday={dash.done_today} doneWeek={dash.done_week} />
 						{/if}
@@ -112,7 +117,7 @@
 			</div>
 			<div class="col side-col">
 				{#each sideWidgets as widget (widget.id)}
-					<div class:sensitive-blur={privacy && widget.sensitive}>
+					<div>
 						{#if widget.id === 'queue'}
 							<QueueWidget items={dash.items} />
 						{:else if widget.id === 'sports'}
@@ -137,14 +142,6 @@
 			title={dark ? 'light mode' : 'dark mode'}
 		>
 			{#if dark}<Sun size={17} />{:else}<Moon size={17} />{/if}
-		</button>
-		<button
-			class="ghost"
-			onclick={() => (privacy = !privacy)}
-			aria-label="toggle privacy mode"
-			title={privacy ? 'show private widgets' : 'privacy mode'}
-		>
-			{#if privacy}<EyeOff size={17} />{:else}<Eye size={17} />{/if}
 		</button>
 		<button
 			class="ghost"
@@ -183,6 +180,16 @@
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
+	}
+	.quick {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 16px;
+	}
+	.quick a {
+		text-decoration: none;
+		gap: 7px;
 	}
 	h1 {
 		font-size: 44px;

@@ -201,10 +201,3 @@ select:focus {
 	outline: 2px solid var(--ring);
 	outline-offset: 1px;
 }
-
-/* privacy mode: blur sensitive widgets */
-.sensitive-blur {
-	filter: blur(10px);
-	pointer-events: none;
-	user-select: none;
-}

@@ -2,6 +2,8 @@
 	import type { Shortcut } from '$lib/types';
 	import { api } from '$lib/client/api';
 	import { Plus, X, Globe, GripVertical } from '@lucide/svelte';
+	import { ICONS } from '$lib/icons';
+	import IconPicker from './IconPicker.svelte';
 	import { slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 
@@ -10,8 +12,18 @@
 	let adding = $state(false);
 	let label = $state('');
 	let url = $state('');
+	let newIcon = $state<string | null>(null);
+	let addPickerOpen = $state(false);
+	let pickerFor = $state<string | null>(null);
 	let saving = $state(false);
 	let broken = $state<Record<string, boolean>>({});
+
+	async function setIcon(id: string, name: string | null) {
+		pickerFor = null;
+		await api.patchConfig({
+			shortcuts: shortcuts.map((s) => (s.id === id ? { ...s, icon: name ?? undefined } : s))
+		});
+	}
 
 	// drag to rearrange (HTML5 dnd), persisted through the same config patch as everything else
 	let dragIdx = $state<number | null>(null);
@@ -47,9 +59,13 @@
 		try {
 			const u = /^https?:\/\//.test(url.trim()) ? url.trim() : `https://${url.trim()}`;
 			await api.patchConfig({
-				shortcuts: [...shortcuts, { id: crypto.randomUUID(), label: label.trim(), url: u }]
+				shortcuts: [
+					...shortcuts,
+					{ id: crypto.randomUUID(), label: label.trim(), url: u, icon: newIcon ?? undefined }
+				]
 			});
 			label = url = '';
+			newIcon = null;
 			adding = false;
 		} finally {
 			saving = false;
@@ -61,6 +77,13 @@
 	}
 </script>
 
+<svelte:window
+	onclick={() => {
+		pickerFor = null;
+		addPickerOpen = false;
+	}}
+/>
+
 <section>
 	<div class="widget-head">
 		<h2>Shortcuts</h2>
@@ -71,6 +94,34 @@
 
 	{#if adding}
 		<form class="card" onsubmit={add}>
+			<span class="pick-wrap">
+				<button
+					type="button"
+					class="ghost"
+					onclick={(e) => {
+						e.stopPropagation();
+						addPickerOpen = !addPickerOpen;
+					}}
+					title="pick icon (optional)"
+				>
+					{#if newIcon && ICONS[newIcon]}
+						{@const NewIcon = ICONS[newIcon]}
+						<NewIcon size={16} />
+					{:else}
+						<Globe size={16} />
+					{/if}
+				</button>
+				{#if addPickerOpen}
+					<IconPicker
+						value={newIcon}
+						allowNone
+						onpick={(n) => {
+							newIcon = n;
+							addPickerOpen = false;
+						}}
+					/>
+				{/if}
+			</span>
 			<!-- svelte-ignore a11y_autofocus -->
 			<input bind:value={label} placeholder="label" autofocus />
 			<input bind:value={url} placeholder="https://…" />
@@ -108,18 +159,36 @@
 				ondragend={resetDrag}
 			>
 				<span class="grip" aria-hidden="true"><GripVertical size={14} /></span>
-				<a href={s.url} class="link">
-					{#if favicon(s.url) && !broken[s.id]}
-						<img
-							src={favicon(s.url)}
-							alt=""
-							width="20"
-							height="20"
-							onerror={() => (broken = { ...broken, [s.id]: true })}
-						/>
-					{:else}
-						<Globe size={18} aria-hidden="true" />
+				<span class="pick-wrap">
+					<button
+						class="icon-slot"
+						onclick={(e) => {
+							e.stopPropagation();
+							pickerFor = pickerFor === s.id ? null : s.id;
+						}}
+						aria-label="change icon"
+						title="change icon"
+					>
+						{#if s.icon && ICONS[s.icon]}
+							{@const RowIcon = ICONS[s.icon]}
+							<RowIcon size={18} />
+						{:else if favicon(s.url) && !broken[s.id]}
+							<img
+								src={favicon(s.url)}
+								alt=""
+								width="20"
+								height="20"
+								onerror={() => (broken = { ...broken, [s.id]: true })}
+							/>
+						{:else}
+							<Globe size={18} aria-hidden="true" />
+						{/if}
+					</button>
+					{#if pickerFor === s.id}
+						<IconPicker value={s.icon ?? null} allowNone onpick={(n) => setIcon(s.id, n)} />
 					{/if}
+				</span>
+				<a href={s.url} class="link">
 					<span class="label">{s.label}</span>
 				</a>
 				<button class="ghost remove" onclick={() => remove(s.id)} aria-label="remove shortcut">
@@ -178,22 +247,40 @@
 	.row:hover .grip {
 		opacity: 1;
 	}
+	.pick-wrap {
+		position: relative;
+		display: inline-flex;
+		flex: none;
+	}
+	.icon-slot {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		background: none;
+		border: none;
+		border-radius: var(--radius-sm);
+		color: var(--muted-foreground);
+		cursor: pointer;
+		padding: 0;
+	}
+	.icon-slot:hover {
+		background: var(--muted);
+		color: var(--foreground);
+	}
+	.icon-slot img {
+		border-radius: 4px;
+	}
 	.link {
 		flex: 1;
 		display: flex;
 		align-items: center;
-		gap: 11px;
-		padding: 10px 10px 10px 4px;
+		padding: 10px 10px 10px 6px;
 		text-decoration: none;
 		font-size: 14.5px;
 		font-weight: 500;
 		min-width: 0;
-	}
-	.link :global(svg),
-	.link img {
-		flex: none;
-		border-radius: 4px;
-		color: var(--muted-foreground);
 	}
 	.label {
 		overflow: hidden;

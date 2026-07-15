@@ -50,6 +50,12 @@ export interface Shortcut {
 	icon?: string;
 }
 
+export interface QuickLink {
+	label: string;
+	url: string;
+	icon?: string;
+}
+
 export interface Widget {
 	id: string;
 	visible: boolean;
@@ -59,11 +65,13 @@ export interface Widget {
 
 export interface Config {
 	focus: string;
+	focus_icon: string;
 	name: string;
 	wallpaper: string;
 	calorie_target: number | null;
 	budget_month: number | null;
 	shortcuts: Shortcut[];
+	quick_links: QuickLink[];
 	widgets: Widget[];
 }
 

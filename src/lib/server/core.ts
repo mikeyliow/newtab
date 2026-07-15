@@ -1,8 +1,8 @@
 import { getDb } from './db';
 import { KINDS, MEDIUMS, CONTEXTS } from '$lib/types';
-import type { Item, Meal, Spend, Shortcut, Widget, Config } from '$lib/types';
+import type { Item, Meal, Spend, Shortcut, QuickLink, Widget, Config } from '$lib/types';
 
-export type { Item, Meal, Spend, Shortcut, Widget, Config };
+export type { Item, Meal, Spend, Shortcut, QuickLink, Widget, Config };
 
 export class CoreError extends Error {}
 
@@ -229,13 +229,30 @@ export function getConfig(): Config {
 	const row = getDb().prepare('SELECT * FROM config WHERE id = 1').get() as any;
 	return {
 		focus: row.focus,
+		focus_icon: row.focus_icon,
 		name: row.name,
 		wallpaper: row.wallpaper,
 		calorie_target: row.calorie_target,
 		budget_month: row.budget_month,
 		shortcuts: JSON.parse(row.shortcuts),
+		quick_links: JSON.parse(row.quick_links),
 		widgets: JSON.parse(row.widgets)
 	};
+}
+
+export function setFocusIcon(name: string): Config {
+	if (typeof name !== 'string') throw new CoreError('focus_icon must be a string (icon name, empty to clear)');
+	getDb().prepare('UPDATE config SET focus_icon = ? WHERE id = 1').run(name.trim());
+	return getConfig();
+}
+
+export function setQuickLinks(links: QuickLink[]): Config {
+	if (!Array.isArray(links)) throw new CoreError('quick_links must be an array');
+	for (const l of links) {
+		if (!l.label?.trim() || !l.url?.trim()) throw new CoreError('every quick link needs a label and url');
+	}
+	getDb().prepare('UPDATE config SET quick_links = ? WHERE id = 1').run(JSON.stringify(links));
+	return getConfig();
 }
 
 export function setName(text: string): Config {

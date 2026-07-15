@@ -3,7 +3,8 @@
 	// + Raptors next/last game (ESPN, server-cached).
 	import races from '$lib/data/f1-2026.json';
 	import type { RaptorsInfo } from '$lib/types';
-	import { Flag, Trophy } from '@lucide/svelte';
+	import { CarFront } from '@lucide/svelte';
+	import Basketball from './Basketball.svelte';
 
 	let { raptors = null }: { raptors?: RaptorsInfo | null } = $props();
 
@@ -36,7 +37,7 @@
 			</div>
 			{#if next}
 				<div class="line">
-					<Flag size={16} aria-hidden="true" class="f1" />
+					<CarFront size={16} aria-hidden="true" class="f1" />
 					<div class="text">
 						<span class="title">{next.name}</span>
 						<span class="meta">{next.location} · {shortDate(next.date)}</span>
@@ -52,7 +53,7 @@
 			<div class="card block">
 				{#if raptors.next}
 					<div class="line">
-						<Trophy size={16} aria-hidden="true" class="nba" />
+						<span class="ic nba"><Basketball size={16} /></span>
 						<div class="text">
 							<span class="title">Raptors {raptors.next.home ? 'vs' : '@'} {raptors.next.opponent}</span>
 							<span class="meta">{shortDate(raptors.next.date)}</span>
@@ -64,7 +65,7 @@
 				{/if}
 				{#if raptors.last}
 					<div class="line" class:dim={!!raptors.next}>
-						{#if !raptors.next}<Trophy size={16} aria-hidden="true" class="nba" />{/if}
+						{#if !raptors.next}<span class="ic nba"><Basketball size={16} /></span>{/if}
 						<div class="text">
 							<span class="title small">
 								{raptors.last.win ? 'W' : 'L'}
@@ -136,8 +137,11 @@
 		flex: none;
 		color: var(--kind-do);
 	}
-	.line :global(.nba) {
+	.ic {
+		display: inline-flex;
 		flex: none;
+	}
+	.ic.nba {
 		color: var(--ctx-content);
 	}
 	.line.dim {

@@ -1,8 +1,14 @@
 {
 	"config": {
 		"focus": "",
+		"focus_icon": "",
 		"name": "Mikey",
 		"wallpaper": "",
+		"quick_links": [
+			{ "label": "Calendar", "url": "https://calendar.google.com/u/0", "icon": "calendar" },
+			{ "label": "Mail", "url": "https://mail.google.com/mail/u/0/#inbox", "icon": "mail" },
+			{ "label": "Tasks", "url": "https://tasks.google.com/", "icon": "square-check-big" }
+		],
 		"calorie_target": null,
 		"budget_month": null,
 		"shortcuts": [

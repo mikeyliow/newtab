@@ -79,6 +79,11 @@ function migrate(db: Database.Database) {
 	const cols = (db.prepare('PRAGMA table_info(config)').all() as { name: string }[]).map((c) => c.name);
 	if (!cols.includes('name')) db.exec(`ALTER TABLE config ADD COLUMN name TEXT NOT NULL DEFAULT 'Mikey'`);
 	if (!cols.includes('wallpaper')) db.exec(`ALTER TABLE config ADD COLUMN wallpaper TEXT NOT NULL DEFAULT ''`);
+	if (!cols.includes('focus_icon')) db.exec(`ALTER TABLE config ADD COLUMN focus_icon TEXT NOT NULL DEFAULT ''`);
+	if (!cols.includes('quick_links'))
+		db.exec(
+			`ALTER TABLE config ADD COLUMN quick_links TEXT NOT NULL DEFAULT '${JSON.stringify(DEFAULT_QUICK_LINKS)}'`
+		);
 }
 
 function seedIfEmpty(db: Database.Database) {
@@ -94,7 +99,8 @@ function seedIfEmpty(db: Database.Database) {
 
 	const cfg = seed.config ?? {};
 	db.prepare(
-		'INSERT INTO config (id, focus, calorie_target, budget_month, shortcuts, widgets, name, wallpaper) VALUES (1, ?, ?, ?, ?, ?, ?, ?)'
+		`INSERT INTO config (id, focus, calorie_target, budget_month, shortcuts, widgets, name, wallpaper, focus_icon, quick_links)
+		 VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	).run(
 		cfg.focus ?? '',
 		cfg.calorie_target ?? null,
@@ -102,7 +108,9 @@ function seedIfEmpty(db: Database.Database) {
 		JSON.stringify(cfg.shortcuts ?? []),
 		JSON.stringify(cfg.widgets ?? DEFAULT_WIDGETS),
 		cfg.name ?? 'Mikey',
-		cfg.wallpaper ?? ''
+		cfg.wallpaper ?? '',
+		cfg.focus_icon ?? '',
+		JSON.stringify(cfg.quick_links ?? DEFAULT_QUICK_LINKS)
 	);
 
 	const insert = db.prepare(
@@ -122,6 +130,12 @@ function seedIfEmpty(db: Database.Database) {
 		);
 	}
 }
+
+export const DEFAULT_QUICK_LINKS = [
+	{ label: 'Calendar', url: 'https://calendar.google.com/u/0', icon: 'calendar' },
+	{ label: 'Mail', url: 'https://mail.google.com/mail/u/0/#inbox', icon: 'mail' },
+	{ label: 'Tasks', url: 'https://tasks.google.com/', icon: 'square-check-big' }
+];
 
 export const DEFAULT_WIDGETS = [
 	{ id: 'progress', visible: true, order: 1, sensitive: false },

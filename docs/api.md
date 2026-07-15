@@ -36,7 +36,7 @@ All bodies are JSON. Validation failures return `400 {"error": "<message>"}`; mi
 | `POST /api/meals` | `{name, kcal, p?, c?, f?, date?}` (macros in grams) | created `Meal` |
 | `DELETE /api/meals/:id` | — | `{ok: true}` |
 | `GET /api/config` | — | `Config` |
-| `PATCH /api/config` | any subset of `{focus, name, wallpaper, calorie_target, budget_month, shortcuts, widgets}` | updated `Config` |
+| `PATCH /api/config` | any subset of `{focus, focus_icon, name, wallpaper, calorie_target, budget_month, shortcuts, quick_links, widgets}` | updated `Config` |
 | `GET /api/export` | — | full DB dump as JSON (used by the backup script) |
 
 Notes:

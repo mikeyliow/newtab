@@ -3,11 +3,10 @@
 	import { KINDS, CONTEXTS, MEDIUMS } from '$lib/types';
 	import { api } from '$lib/client/api';
 	import ItemRow from './ItemRow.svelte';
-	import { Plus, ListFilter, Check, RotateCcw } from '@lucide/svelte';
+	import { Plus, ListFilter, Check, RotateCcw, ChevronDown } from '@lucide/svelte';
 	import { browser } from '$app/environment';
 	import { slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-
 	import { tick } from 'svelte';
 
 	let {
@@ -15,12 +14,18 @@
 		doneToday = [],
 		doneWeek = []
 	}: { items: Item[]; doneToday?: Item[]; doneWeek?: number[] } = $props();
-	const weekTotal = $derived(doneWeek.reduce((a, b) => a + b, 0));
-	const weekMax = $derived(Math.max(1, ...doneWeek));
+
+	// collapsed by default: the card is a stat summary, the list shows on click
+	let expanded = $state(false);
 	let showDone = $state(false);
 	let titleInput = $state<HTMLInputElement | null>(null);
 
+	const openToday = $derived(items.filter((i) => i.status === 'open' && i.kind === 'do').length);
+	const openLater = $derived(items.filter((i) => i.status === 'open' && i.kind === 'think').length);
+	const weekDone = $derived(doneWeek.reduce((a, b) => a + b, 0));
+
 	async function openAdd() {
+		expanded = true;
 		adding = true;
 		await tick();
 		titleInput?.focus();
@@ -112,19 +117,37 @@
 	}
 </script>
 
+{#snippet donut(done: number, total: number, color: string, label: string)}
+	{@const frac = total > 0 ? done / total : 0}
+	{@const C = 2 * Math.PI * 19}
+	<span class="donut" title="{done} of {total} {label}">
+		<svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+			<circle cx="24" cy="24" r="19" fill="none" stroke="var(--muted)" stroke-width="5" />
+			{#if frac > 0}
+				<circle
+					cx="24"
+					cy="24"
+					r="19"
+					fill="none"
+					stroke={color}
+					stroke-width="5"
+					stroke-linecap="round"
+					stroke-dasharray="{C * frac} {C}"
+					transform="rotate(-90 24 24)"
+					style="transition: stroke-dasharray 0.5s ease"
+				/>
+			{/if}
+			<text x="24" y="28" text-anchor="middle" class="donut-num">{done}/{total}</text>
+		</svg>
+		<span class="micro">{label}</span>
+	</span>
+{/snippet}
+
 <svelte:window onclick={() => (filterOpen = false)} onkeydown={onKeydown} />
 
 <section>
 	<div class="widget-head">
 		<h2>Items</h2>
-		{#if weekTotal}
-			<span class="spark" title="{weekTotal} done in the last 7 days">
-				{#each doneWeek as c, i (i)}
-					<span class="spark-bar" style:height="{4 + (c / weekMax) * 10}px" class:zero={!c}></span>
-				{/each}
-				<span class="spark-label">{weekTotal} this wk</span>
-			</span>
-		{/if}
 		<div class="head-actions">
 			<div class="filter-wrap">
 				<button
@@ -163,65 +186,79 @@
 	</div>
 
 	<div class="card body">
-		{#if adding}
-			<form onsubmit={add}>
-				<!-- svelte-ignore a11y_autofocus -->
-				<input class="grow" bind:this={titleInput} bind:value={title} placeholder="what is it?" autofocus />
-				<select bind:value={kind}>
-					{#each KINDS as k (k)}<option value={k}>{kindLabels[k]}</option>{/each}
-				</select>
-				{#if kind === 'queue'}
-					<select bind:value={medium}>
-						{#each MEDIUMS as m (m)}<option value={m}>{m}</option>{/each}
-					</select>
-					<input class="grow" bind:value={url} placeholder="url (optional)" />
-				{/if}
-				<select bind:value={context}>
-					<option value="">no context</option>
-					{#each CONTEXTS as c (c)}<option value={c}>{c}</option>{/each}
-				</select>
-				<button class="pill" type="submit" disabled={saving}>Add</button>
-			</form>
-		{/if}
-
-		{#if sections.length === 0}
-			<p class="empty">{filterActive ? 'Nothing matches the filter.' : 'Nothing here. Nice.'}</p>
-		{/if}
-		{#each sections as section (section.label)}
-			<div class="section">
-				<span class="micro section-label">{section.label} · {section.items.length}</span>
-				{#each section.items as item (item.id)}
-					<div animate:flip={{ duration: 220 }} in:slide={{ duration: 180 }} out:slide={{ duration: 160 }}>
-						<ItemRow {item} />
-					</div>
-				{/each}
+		<button class="summary" onclick={() => (expanded = !expanded)} aria-expanded={expanded}>
+			{@render donut(doneToday.length, doneToday.length + openToday, 'var(--kind-do)', 'today')}
+			{@render donut(weekDone, weekDone + openToday + openLater, 'var(--kind-queue)', 'week')}
+			<div class="sums">
+				<span class="sum">{openToday} open today</span>
+				<span class="sum dim">{openLater} later</span>
 			</div>
-		{/each}
-	</div>
-
-	{#if doneToday.length}
-		<button class="done-line" onclick={() => (showDone = !showDone)}>
-			<Check size={12} strokeWidth={3} />
-			{doneToday.length} done today · {showDone ? 'hide' : 'show'}
+			<ChevronDown size={16} class="chev {expanded ? 'up' : ''}" />
 		</button>
-		{#if showDone}
-			<div class="card done-list" transition:slide={{ duration: 180 }}>
-				{#each doneToday as item (item.id)}
-					<div class="done-row">
-						<span class="done-title">{item.title}</span>
-						<button
-							class="ghost"
-							onclick={() => api.updateItem(item.id, { status: 'open' })}
-							aria-label="reopen"
-							title="undo — back to open"
-						>
-							<RotateCcw size={14} />
-						</button>
+
+		{#if expanded}
+			<div class="lists" transition:slide={{ duration: 200 }}>
+				{#if adding}
+					<form onsubmit={add}>
+						<!-- svelte-ignore a11y_autofocus -->
+						<input class="grow" bind:this={titleInput} bind:value={title} placeholder="what is it?" autofocus />
+						<select bind:value={kind}>
+							{#each KINDS as k (k)}<option value={k}>{kindLabels[k]}</option>{/each}
+						</select>
+						{#if kind === 'queue'}
+							<select bind:value={medium}>
+								{#each MEDIUMS as m (m)}<option value={m}>{m}</option>{/each}
+							</select>
+							<input class="grow" bind:value={url} placeholder="url (optional)" />
+						{/if}
+						<select bind:value={context}>
+							<option value="">no context</option>
+							{#each CONTEXTS as c (c)}<option value={c}>{c}</option>{/each}
+						</select>
+						<button class="pill" type="submit" disabled={saving}>Add</button>
+					</form>
+				{/if}
+
+				{#if sections.length === 0}
+					<p class="empty">{filterActive ? 'Nothing matches the filter.' : 'Nothing here. Nice.'}</p>
+				{/if}
+				{#each sections as section (section.label)}
+					<div class="section">
+						<span class="micro section-label">{section.label} · {section.items.length}</span>
+						{#each section.items as item (item.id)}
+							<div animate:flip={{ duration: 220 }} in:slide={{ duration: 180 }} out:slide={{ duration: 160 }}>
+								<ItemRow {item} />
+							</div>
+						{/each}
 					</div>
 				{/each}
+
+				{#if doneToday.length}
+					<button class="done-line" onclick={() => (showDone = !showDone)}>
+						<Check size={12} strokeWidth={3} />
+						{doneToday.length} done today · {showDone ? 'hide' : 'show'}
+					</button>
+					{#if showDone}
+						<div class="done-list" transition:slide={{ duration: 180 }}>
+							{#each doneToday as item (item.id)}
+								<div class="done-row">
+									<span class="done-title">{item.title}</span>
+									<button
+										class="ghost"
+										onclick={() => api.updateItem(item.id, { status: 'open' })}
+										aria-label="reopen"
+										title="undo — back to open"
+									>
+										<RotateCcw size={14} />
+									</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				{/if}
 			</div>
 		{/if}
-	{/if}
+	</div>
 </section>
 
 <style>
@@ -300,10 +337,69 @@
 	.ctx-personal {
 		background: var(--ctx-personal);
 	}
+
 	.body {
-		padding: 6px 24px;
+		padding: 8px 24px;
 		display: flex;
 		flex-direction: column;
+	}
+	.summary {
+		display: flex;
+		align-items: center;
+		gap: 22px;
+		width: 100%;
+		background: none;
+		border: none;
+		padding: 10px 0;
+		cursor: pointer;
+		font: inherit;
+		color: var(--foreground);
+		text-align: left;
+	}
+	.donut {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+		flex: none;
+	}
+	.donut .micro {
+		font-size: 9px;
+	}
+	:global(.donut-num) {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		font-weight: 500;
+		fill: var(--foreground);
+	}
+	.sums {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.sum {
+		font-size: 14.5px;
+		font-weight: 500;
+	}
+	.sum.dim {
+		font-size: 13px;
+		font-weight: 400;
+		color: var(--muted-2);
+	}
+	.summary :global(.chev) {
+		margin-left: auto;
+		color: var(--muted-2);
+		transition: transform 0.2s ease;
+	}
+	.summary :global(.chev.up) {
+		transform: rotate(180deg);
+	}
+	.lists {
+		display: flex;
+		flex-direction: column;
+		border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+		padding-top: 4px;
+		padding-bottom: 8px;
 	}
 	form {
 		display: flex;
@@ -312,7 +408,7 @@
 		background: var(--muted);
 		padding: 12px;
 		border-radius: var(--radius-md);
-		margin: 12px 0 6px;
+		margin: 10px 0 4px;
 	}
 	form input,
 	form select {
@@ -327,26 +423,6 @@
 		color: var(--muted-2);
 		margin: 12px 0;
 	}
-	.spark {
-		display: inline-flex;
-		align-items: flex-end;
-		gap: 2px;
-		margin-left: 14px;
-	}
-	.spark-bar {
-		width: 4px;
-		border-radius: 1.5px;
-		background: var(--kind-queue);
-	}
-	.spark-bar.zero {
-		background: var(--accent);
-	}
-	.spark-label {
-		font-family: var(--font-mono);
-		font-size: 11px;
-		color: var(--muted-2);
-		margin-left: 6px;
-	}
 	.section {
 		display: flex;
 		flex-direction: column;
@@ -356,14 +432,14 @@
 		margin-top: 12px;
 	}
 	.section:first-of-type .section-label {
-		margin-top: 4px;
+		margin-top: 6px;
 	}
 	.done-line {
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
 		align-self: flex-start;
-		margin-top: 10px;
+		margin-top: 12px;
 		background: none;
 		border: none;
 		padding: 0;
@@ -378,14 +454,13 @@
 		color: var(--foreground);
 	}
 	.done-list {
-		margin-top: 8px;
-		padding: 6px 20px;
+		margin-top: 6px;
 	}
 	.done-row {
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		padding: 8px 0;
+		padding: 7px 0;
 		border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
 	}
 	.done-row:last-child {
