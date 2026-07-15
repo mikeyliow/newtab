@@ -45,7 +45,11 @@
 	--macro-f: #c76f8a;
 }
 /* theme: light by default; .dark on <html> via the header toggle (persisted per device) */
+:root {
+	color-scheme: light;
+}
 .dark {
+	color-scheme: dark;
 	--background: #131312;
 	--foreground: #f3efeb;
 	--card: #1c1b1a;

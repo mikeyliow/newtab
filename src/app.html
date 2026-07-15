@@ -5,10 +5,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<script>
-			// apply the saved theme before first paint — no light flash for dark users
+			// apply the saved theme before first paint — and tell the browser the canvas is dark
+			// (color-scheme is what makes Chrome's pre-render frame black instead of white,
+			//  the same trick Threads/X use)
 			try {
-				if (localStorage.getItem('newtab:theme') === 'dark')
+				if (localStorage.getItem('newtab:theme') === 'dark') {
 					document.documentElement.classList.add('dark');
+					document.documentElement.style.colorScheme = 'dark';
+				}
 			} catch (e) {
 				/* no localStorage, default light */
 			}
@@ -16,9 +20,11 @@
 		<style>
 			html {
 				background: #faf9f6;
+				color-scheme: light;
 			}
 			html.dark {
 				background: #131312;
+				color-scheme: dark;
 			}
 		</style>
 		%sveltekit.head%
