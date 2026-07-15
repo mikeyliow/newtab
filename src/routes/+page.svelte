@@ -9,6 +9,7 @@
 	import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import Background from '$lib/components/Background.svelte';
+	import SearchOverlay from '$lib/components/SearchOverlay.svelte';
 	import StatusLines from '$lib/components/StatusLines.svelte';
 	import { greeting as pickGreeting } from '$lib/greetings';
 	import { ICONS } from '$lib/icons';
@@ -80,6 +81,7 @@
 	{#if !dash.config.wallpaper}
 		<Background />
 	{/if}
+	<SearchOverlay />
 	<main>
 		<header class="top">
 			<div class="hello">

@@ -31,15 +31,6 @@
 		titleInput?.focus();
 	}
 
-	// quick-add: press "a" anywhere (outside a field) to open the add form
-	function onKeydown(e: KeyboardEvent) {
-		if (e.key !== 'a' || e.metaKey || e.ctrlKey || e.altKey) return;
-		const t = e.target as HTMLElement;
-		if (t.closest('input, textarea, select, [contenteditable]')) return;
-		e.preventDefault();
-		openAdd();
-	}
-
 	// context filter: multi-select, persisted per device
 	const FILTER_KEY = 'newtab:ctx-filter';
 	const FILTER_OPTIONS = [...CONTEXTS, 'untagged'] as const;
@@ -142,7 +133,7 @@
 	</span>
 {/snippet}
 
-<svelte:window onclick={() => (filterOpen = false)} onkeydown={onKeydown} />
+<svelte:window onclick={() => (filterOpen = false)} />
 
 <section>
 	<div class="widget-head">
