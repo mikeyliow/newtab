@@ -1,8 +1,8 @@
 import { getDb } from './db';
 import { KINDS, MEDIUMS, CONTEXTS } from '$lib/types';
-import type { Item, Meal, Spend, Shortcut, QuickLink, Widget, Config } from '$lib/types';
+import type { Item, LibraryItem, Meal, Spend, Shortcut, QuickLink, Widget, Config } from '$lib/types';
 
-export type { Item, Meal, Spend, Shortcut, QuickLink, Widget, Config };
+export type { Item, LibraryItem, Meal, Spend, Shortcut, QuickLink, Widget, Config };
 
 export class CoreError extends Error {}
 
@@ -156,6 +156,71 @@ export function completeItem(id: string): Item {
 export function removeItem(id: string): void {
 	const res = getDb().prepare('DELETE FROM items WHERE id = ?').run(id);
 	if (res.changes === 0) throw new CoreError(`no item with id ${id}`);
+}
+
+// ---- library (reads / watches / listens — its own lean store) ----
+
+export function listLibrary(status?: string): LibraryItem[] {
+	const s = status ? assertOneOf(status, ['open', 'done'] as const, 'status') : 'open';
+	return getDb()
+		.prepare('SELECT * FROM library WHERE status = ? ORDER BY created_at DESC')
+		.all(s) as LibraryItem[];
+}
+
+export function addLibraryItem(input: {
+	title: string;
+	url?: string | null;
+	medium?: string | null;
+	source?: string | null;
+}): LibraryItem {
+	if (typeof input.title !== 'string' || !input.title.trim()) throw new CoreError('title is required');
+	const medium = assertOptional(input.medium, MEDIUMS, 'medium');
+	const id = crypto.randomUUID();
+	getDb()
+		.prepare(`INSERT INTO library (id, title, url, medium, source, status) VALUES (?, ?, ?, ?, ?, 'open')`)
+		.run(id, input.title.trim(), input.url || null, medium, input.source || null);
+	return getDb().prepare('SELECT * FROM library WHERE id = ?').get(id) as LibraryItem;
+}
+
+export function updateLibraryItem(
+	id: string,
+	patch: Partial<{ title: string; url: string | null; medium: string | null; source: string | null; status: string }>
+): LibraryItem {
+	const current = getDb().prepare('SELECT * FROM library WHERE id = ?').get(id) as LibraryItem | undefined;
+	if (!current) throw new CoreError(`no library item with id ${id}`);
+	const sets: string[] = [];
+	const params: unknown[] = [];
+	if (patch.title !== undefined) {
+		if (typeof patch.title !== 'string' || !patch.title.trim()) throw new CoreError('title cannot be empty');
+		sets.push('title = ?');
+		params.push(patch.title.trim());
+	}
+	if (patch.url !== undefined) {
+		sets.push('url = ?');
+		params.push(patch.url || null);
+	}
+	if (patch.medium !== undefined) {
+		sets.push('medium = ?');
+		params.push(assertOptional(patch.medium, MEDIUMS, 'medium'));
+	}
+	if (patch.source !== undefined) {
+		sets.push('source = ?');
+		params.push(patch.source || null);
+	}
+	if (patch.status !== undefined) {
+		const status = assertOneOf(patch.status, ['open', 'done'] as const, 'status');
+		sets.push('status = ?');
+		params.push(status);
+		sets.push('completed_at = ?');
+		params.push(status === 'done' ? new Date().toISOString() : null);
+	}
+	if (sets.length) getDb().prepare(`UPDATE library SET ${sets.join(', ')} WHERE id = ?`).run(...params, id);
+	return getDb().prepare('SELECT * FROM library WHERE id = ?').get(id) as LibraryItem;
+}
+
+export function removeLibraryItem(id: string): void {
+	const res = getDb().prepare('DELETE FROM library WHERE id = ?').run(id);
+	if (res.changes === 0) throw new CoreError(`no library item with id ${id}`);
 }
 
 // ---- meals ----
@@ -366,6 +431,7 @@ export function getDashboard() {
 		date: todayLocal(),
 		config,
 		items,
+		library: listLibrary('open'),
 		done_today: doneToday,
 		done_week: doneWeek,
 		meals,

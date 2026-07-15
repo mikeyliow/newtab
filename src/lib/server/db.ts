@@ -34,6 +34,17 @@ function migrate(db: Database.Database) {
 			completed_at TEXT
 		);
 
+		CREATE TABLE IF NOT EXISTS library (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			url TEXT,
+			medium TEXT CHECK (medium IN ('read','listen','watch')),
+			source TEXT,
+			status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','done')),
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			completed_at TEXT
+		);
+
 		CREATE TABLE IF NOT EXISTS meals (
 			id TEXT PRIMARY KEY,
 			date TEXT NOT NULL,
@@ -85,6 +96,19 @@ function migrate(db: Database.Database) {
 			`ALTER TABLE config ADD COLUMN quick_links TEXT NOT NULL DEFAULT '${JSON.stringify(DEFAULT_QUICK_LINKS)}'`
 		);
 
+	// the library got its own table — move any legacy queue-kind items over (one-time)
+	const legacyQueue = db.prepare(`SELECT * FROM items WHERE kind = 'queue'`).all() as any[];
+	if (legacyQueue.length) {
+		const ins = db.prepare(
+			`INSERT INTO library (id, title, url, medium, source, status, created_at, completed_at)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+		);
+		for (const it of legacyQueue) {
+			ins.run(it.id, it.title, it.url, it.medium, it.source, it.status, it.created_at, it.completed_at);
+		}
+		db.prepare(`DELETE FROM items WHERE kind = 'queue'`).run();
+	}
+
 	// newly introduced widgets join existing configs at the end (reorder in Settings)
 	const cfgRow = db.prepare('SELECT widgets FROM config WHERE id = 1').get() as
 		| { widgets: string }
@@ -97,6 +121,25 @@ function migrate(db: Database.Database) {
 			const maxOrder = Math.max(0, ...widgets.map((w) => w.order));
 			missing.forEach((w, i) => widgets.push({ ...w, order: maxOrder + i + 1 }));
 			db.prepare('UPDATE config SET widgets = ? WHERE id = 1').run(JSON.stringify(widgets));
+		}
+
+		// one-time: speed-dial shortcuts moved above items (flagged so later manual reorders stick)
+		const flag = db.prepare(`SELECT 1 FROM cache WHERE key = 'migr:shortcuts-first'`).get();
+		if (!flag) {
+			const sc = widgets.find((w) => w.id === 'shortcuts');
+			const it = widgets.find((w) => w.id === 'items');
+			if (sc && it && sc.order > it.order) {
+				sc.order = it.order - 0.5;
+				widgets
+					.sort((a, b) => a.order - b.order)
+					.forEach((w, i) => (w.order = i + 1));
+				db.prepare('UPDATE config SET widgets = ? WHERE id = 1').run(JSON.stringify(widgets));
+			}
+			db.prepare('INSERT OR REPLACE INTO cache (key, value, fetched_at) VALUES (?, ?, ?)').run(
+				'migr:shortcuts-first',
+				'1',
+				Date.now()
+			);
 		}
 	}
 }
@@ -144,6 +187,13 @@ function seedIfEmpty(db: Database.Database) {
 			it.flagged ? 1 : 0
 		);
 	}
+
+	const insertLib = db.prepare(
+		`INSERT INTO library (id, title, url, medium, source, status) VALUES (?, ?, ?, ?, ?, 'open')`
+	);
+	for (const it of seed.library ?? []) {
+		insertLib.run(crypto.randomUUID(), it.title, it.url ?? null, it.medium ?? null, it.source ?? null);
+	}
 }
 
 export const DEFAULT_QUICK_LINKS = [
@@ -155,10 +205,10 @@ export const DEFAULT_QUICK_LINKS = [
 export const DEFAULT_WIDGETS = [
 	{ id: 'progress', visible: true, order: 1, sensitive: false },
 	{ id: 'focus', visible: true, order: 2, sensitive: false },
-	{ id: 'items', visible: true, order: 3, sensitive: true },
-	{ id: 'queue', visible: true, order: 4, sensitive: false },
-	{ id: 'sports', visible: true, order: 5, sensitive: false },
-	{ id: 'shortcuts', visible: true, order: 6, sensitive: false },
+	{ id: 'shortcuts', visible: true, order: 3, sensitive: false },
+	{ id: 'items', visible: true, order: 4, sensitive: true },
+	{ id: 'queue', visible: true, order: 5, sensitive: false },
+	{ id: 'sports', visible: true, order: 6, sensitive: false },
 	{ id: 'calories', visible: false, order: 7, sensitive: true },
 	{ id: 'budget', visible: false, order: 8, sensitive: true }
 ];

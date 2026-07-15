@@ -22,6 +22,17 @@ export interface Item {
 	completed_at: string | null;
 }
 
+export interface LibraryItem {
+	id: string;
+	title: string;
+	url: string | null;
+	medium: ItemMedium | null;
+	source: string | null;
+	status: ItemStatus;
+	created_at: string;
+	completed_at: string | null;
+}
+
 export interface Meal {
 	id: string;
 	date: string;
@@ -93,6 +104,7 @@ export interface Dashboard {
 	date: string;
 	config: Config;
 	items: Item[];
+	library: LibraryItem[];
 	done_today: Item[];
 	done_week: number[];
 	meals: Meal[];

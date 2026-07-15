@@ -3,7 +3,7 @@
 	import FocusWidget from '$lib/components/FocusWidget.svelte';
 	import ProgressWidget from '$lib/components/ProgressWidget.svelte';
 	import ItemsWidget from '$lib/components/ItemsWidget.svelte';
-	import QueueWidget from '$lib/components/QueueWidget.svelte';
+	import LibraryWidget from '$lib/components/LibraryWidget.svelte';
 	import SportsWidget from '$lib/components/SportsWidget.svelte';
 	import CaloriesWidget from '$lib/components/CaloriesWidget.svelte';
 	import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
@@ -121,7 +121,7 @@
 				{#each sideWidgets as widget (widget.id)}
 					<div>
 						{#if widget.id === 'queue'}
-							<QueueWidget items={dash.items} />
+							<LibraryWidget library={dash.library} />
 						{:else if widget.id === 'sports'}
 							<SportsWidget raptors={data.raptors} />
 						{:else if widget.id === 'calories'}

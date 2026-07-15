@@ -74,7 +74,7 @@
 	let url = $state('');
 	let saving = $state(false);
 
-	const kindLabels: Record<ItemKind, string> = { do: 'Do', think: 'Think', queue: 'Queue' };
+	const kindLabels: Record<ItemKind, string> = { do: 'Do', think: 'Think', queue: 'Library' };
 
 	// queue items live in their own sidebar widget; this view is do/think only
 	const filtered = $derived(
@@ -101,13 +101,12 @@
 		if (!title.trim() || saving) return;
 		saving = true;
 		try {
-			await api.addItem({
-				kind,
-				title,
-				context: context || null,
-				url: kind === 'queue' && url ? url : null,
-				medium: kind === 'queue' ? medium : null
-			});
+			if (kind === 'queue') {
+				// library lives in its own store now
+				await api.addLibrary({ title, url: url || null, medium });
+			} else {
+				await api.addItem({ kind, title, context: context || null });
+			}
 			title = '';
 			url = '';
 			adding = false;
@@ -211,10 +210,12 @@
 							</select>
 							<input class="grow" bind:value={url} placeholder="url (optional)" />
 						{/if}
-						<select bind:value={context}>
-							<option value="">no context</option>
-							{#each CONTEXTS as c (c)}<option value={c}>{c}</option>{/each}
-						</select>
+						{#if kind !== 'queue'}
+							<select bind:value={context}>
+								<option value="">no context</option>
+								{#each CONTEXTS as c (c)}<option value={c}>{c}</option>{/each}
+							</select>
+						{/if}
 						<button class="pill" type="submit" disabled={saving}>Add</button>
 					</form>
 				{/if}

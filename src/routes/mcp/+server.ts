@@ -90,6 +90,42 @@ const TOOLS = [
 		}
 	},
 	{
+		name: 'add_to_library',
+		description: 'Save something to the library — articles to read, videos to watch, podcasts to listen to.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				title: str('short title'),
+				url: str('link'),
+				medium: mediumProp,
+				source: str('where this came from')
+			},
+			required: ['title']
+		},
+		handler: (a: any) => core.addLibraryItem(a)
+	},
+	{
+		name: 'list_library',
+		description: 'List library items (default: open).',
+		inputSchema: { type: 'object', properties: { status: { type: 'string', enum: ['open', 'done'] } } },
+		handler: (a: any) => core.listLibrary(a?.status)
+	},
+	{
+		name: 'complete_library_item',
+		description: 'Mark a library item done (read/watched/listened).',
+		inputSchema: { type: 'object', properties: { id: str('library item id') }, required: ['id'] },
+		handler: (a: any) => core.updateLibraryItem(a.id, { status: 'done' })
+	},
+	{
+		name: 'remove_library_item',
+		description: 'Delete a library item permanently.',
+		inputSchema: { type: 'object', properties: { id: str('library item id') }, required: ['id'] },
+		handler: (a: any) => {
+			core.removeLibraryItem(a.id);
+			return { ok: true };
+		}
+	},
+	{
 		name: 'log_meal',
 		description: 'Log a meal to the calorie tracker. Macros in grams.',
 		inputSchema: {

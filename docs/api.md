@@ -32,6 +32,10 @@ All bodies are JSON. Validation failures return `400 {"error": "<message>"}`; mi
 | `POST /api/items` | `{kind, title, context?, url?, medium?, source?, flagged?}` | created `Item` |
 | `PATCH /api/items/:id` | any subset of `{kind, title, context, url, medium, source, status, flagged}` | updated `Item` |
 | `DELETE /api/items/:id` | — | `{ok: true}` |
+| `GET /api/library` | query: `status?` (default `open`) | `LibraryItem[]` newest first |
+| `POST /api/library` | `{title, url?, medium?, source?}` | created `LibraryItem` |
+| `PATCH /api/library/:id` | any subset of `{title, url, medium, source, status}` | updated `LibraryItem` |
+| `DELETE /api/library/:id` | — | `{ok: true}` |
 | `GET /api/meals` | query: `date?` | `Meal[]` for that day |
 | `POST /api/meals` | `{name, kcal, p?, c?, f?, date?}` (macros in grams) | created `Meal` |
 | `DELETE /api/meals/:id` | — | `{ok: true}` |
@@ -75,6 +79,10 @@ Notes:
 | `complete_item` | `id` | mark done |
 | `update_item` | `id, patch` (same fields as HTTP PATCH) | edit item |
 | `remove_item` | `id` | delete item |
+| `add_to_library` | `title, url?, medium?, source?` | save a read/watch/listen |
+| `list_library` | `status?` | library items |
+| `complete_library_item` | `id` | mark read/watched/listened |
+| `remove_library_item` | `id` | delete from library |
 | `log_meal` | `name, kcal, p?, c?, f?, date?` | log a meal |
 | `list_meals` | `date?` | meals for a day |
 | `log_spend` | `amount, category, note?, currency?, date?` | log an expense (widget parked, log works) |
