@@ -86,9 +86,15 @@
 	box-sizing: border-box;
 }
 
+/* background lives on html (see also the pre-paint style in app.html); body stays
+   transparent so the fixed z-index:-1 blob layer shows through */
+html {
+	background: var(--background);
+}
+
 body {
 	margin: 0;
-	background: var(--background);
+	background: transparent;
 	color: var(--foreground);
 	font-family: var(--font-sans);
 	font-size: 16px;

@@ -46,42 +46,42 @@
 		width: 52vmax;
 		left: -14vmax;
 		top: -16vmax;
-		background: radial-gradient(circle at 35% 35%, #f6dfc4 0%, transparent 66%);
+		background: radial-gradient(circle at 35% 35%, #f8d8b0 0%, transparent 66%);
 		animation: drift-1 13s ease-in-out infinite alternate;
 	}
 	.b2 {
 		width: 44vmax;
 		right: -8vmax;
 		top: -6vmax;
-		background: radial-gradient(circle at 60% 40%, #f3d7cf 0%, transparent 64%);
+		background: radial-gradient(circle at 60% 40%, #f6ccc0 0%, transparent 64%);
 		animation: drift-2 17s ease-in-out infinite alternate;
 	}
 	.b3 {
 		width: 48vmax;
 		left: 14vmax;
 		bottom: -20vmax;
-		background: radial-gradient(circle at 50% 50%, #dbe5d3 0%, transparent 66%);
+		background: radial-gradient(circle at 50% 50%, #cfe3c1 0%, transparent 66%);
 		animation: drift-3 15s ease-in-out infinite alternate;
 	}
 	.b4 {
 		width: 40vmax;
 		right: 4vmax;
 		bottom: -10vmax;
-		background: radial-gradient(circle at 45% 55%, #d7e0e8 0%, transparent 64%);
+		background: radial-gradient(circle at 45% 55%, #c6dcec 0%, transparent 64%);
 		animation: drift-4 19s ease-in-out infinite alternate;
 	}
 	.b5 {
 		width: 34vmax;
 		left: 34vmax;
 		top: 6vmax;
-		background: radial-gradient(circle at 50% 40%, #efe3f0 0%, transparent 62%);
+		background: radial-gradient(circle at 50% 40%, #ead7f1 0%, transparent 62%);
 		animation: drift-5 10s ease-in-out infinite alternate;
 	}
 	.b6 {
 		width: 30vmax;
 		left: -4vmax;
 		top: 32vmax;
-		background: radial-gradient(circle at 50% 50%, #f2ecd7 0%, transparent 62%);
+		background: radial-gradient(circle at 50% 50%, #f2e7c0 0%, transparent 62%);
 		animation: drift-6 8s ease-in-out infinite alternate;
 	}
 
@@ -91,7 +91,7 @@
 		left: var(--mx);
 		top: var(--my);
 		translate: -50% -50%;
-		background: radial-gradient(circle, #f7e2c4 0%, transparent 60%);
+		background: radial-gradient(circle, #f9dcae 0%, transparent 60%);
 		opacity: 0.85;
 		transition:
 			left 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -102,7 +102,7 @@
 		left: var(--mx);
 		top: var(--my);
 		translate: -50% -50%;
-		background: radial-gradient(circle, #e4dcec 0%, transparent 58%);
+		background: radial-gradient(circle, #dccdee 0%, transparent 58%);
 		opacity: 0.6;
 		transition:
 			left 2.4s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -111,29 +111,29 @@
 
 	/* dark theme: the same orbits, embers instead of pastels */
 	:global(.dark) .b1 {
-		background: radial-gradient(circle at 35% 35%, #2c2418 0%, transparent 66%);
+		background: radial-gradient(circle at 35% 35%, #3d301b 0%, transparent 66%);
 	}
 	:global(.dark) .b2 {
-		background: radial-gradient(circle at 60% 40%, #2c211e 0%, transparent 64%);
+		background: radial-gradient(circle at 60% 40%, #3d2a24 0%, transparent 64%);
 	}
 	:global(.dark) .b3 {
-		background: radial-gradient(circle at 50% 50%, #202619 0%, transparent 66%);
+		background: radial-gradient(circle at 50% 50%, #2a351f 0%, transparent 66%);
 	}
 	:global(.dark) .b4 {
-		background: radial-gradient(circle at 45% 55%, #1d2329 0%, transparent 64%);
+		background: radial-gradient(circle at 45% 55%, #242f3b 0%, transparent 64%);
 	}
 	:global(.dark) .b5 {
-		background: radial-gradient(circle at 50% 40%, #271f2a 0%, transparent 62%);
+		background: radial-gradient(circle at 50% 40%, #352739 0%, transparent 62%);
 	}
 	:global(.dark) .b6 {
-		background: radial-gradient(circle at 50% 50%, #262415 0%, transparent 62%);
+		background: radial-gradient(circle at 50% 50%, #35311a 0%, transparent 62%);
 	}
 	:global(.dark) .c1 {
-		background: radial-gradient(circle, #322a1c 0%, transparent 60%);
+		background: radial-gradient(circle, #453823 0%, transparent 60%);
 		opacity: 0.95;
 	}
 	:global(.dark) .c2 {
-		background: radial-gradient(circle, #262031 0%, transparent 58%);
+		background: radial-gradient(circle, #332b44 0%, transparent 58%);
 		opacity: 0.7;
 	}
 
