@@ -84,6 +84,21 @@ function migrate(db: Database.Database) {
 		db.exec(
 			`ALTER TABLE config ADD COLUMN quick_links TEXT NOT NULL DEFAULT '${JSON.stringify(DEFAULT_QUICK_LINKS)}'`
 		);
+
+	// newly introduced widgets join existing configs at the end (reorder in Settings)
+	const cfgRow = db.prepare('SELECT widgets FROM config WHERE id = 1').get() as
+		| { widgets: string }
+		| undefined;
+	if (cfgRow) {
+		const widgets = JSON.parse(cfgRow.widgets) as { id: string; order: number }[];
+		const have = new Set(widgets.map((w) => w.id));
+		const missing = DEFAULT_WIDGETS.filter((w) => !have.has(w.id));
+		if (missing.length) {
+			const maxOrder = Math.max(0, ...widgets.map((w) => w.order));
+			missing.forEach((w, i) => widgets.push({ ...w, order: maxOrder + i + 1 }));
+			db.prepare('UPDATE config SET widgets = ? WHERE id = 1').run(JSON.stringify(widgets));
+		}
+	}
 }
 
 function seedIfEmpty(db: Database.Database) {
