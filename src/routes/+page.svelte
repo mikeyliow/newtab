@@ -92,7 +92,7 @@
 					<nav class="quick">
 						{#each dash.config.quick_links as q (q.url)}
 							{@const QIcon = (q.icon && ICONS[q.icon]) || Globe}
-							<a class="soft" href={q.url}><QIcon size={14} />{q.label}</a>
+							<a class="soft" href={q.url} target="_blank" rel="noreferrer"><QIcon size={14} />{q.label}</a>
 						{/each}
 					</nav>
 				{/if}

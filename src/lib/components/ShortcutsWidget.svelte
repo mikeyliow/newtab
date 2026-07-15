@@ -180,7 +180,7 @@
 				}}
 				ondragend={resetDrag}
 			>
-				<a href={s.url} class="tile-link">
+				<a href={s.url} class="tile-link" target="_blank" rel="noreferrer">
 					<span class="tile-icon">{@render icon(s, 22)}</span>
 					<span class="tile-label">{s.label}</span>
 				</a>
@@ -223,7 +223,7 @@
 						{#each overflow as s (s.id)}
 							<div class="folder-row">
 								<span class="tile-icon sm">{@render icon(s, 16)}</span>
-								<a href={s.url} class="folder-label">{s.label}</a>
+								<a href={s.url} class="folder-label" target="_blank" rel="noreferrer">{s.label}</a>
 								<button class="ghost" onclick={() => remove(s.id)} aria-label="remove shortcut">
 									<X size={13} />
 								</button>
