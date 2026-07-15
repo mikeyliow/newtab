@@ -37,14 +37,14 @@
 	.grid {
 		display: grid;
 		grid-auto-flow: column;
-		grid-template-rows: repeat(7, 4px);
-		grid-auto-columns: 4px;
-		gap: 2px;
+		grid-template-rows: repeat(7, 6px);
+		grid-auto-columns: 6px;
+		gap: 2.5px;
 	}
 	.tile {
-		width: 4px;
-		height: 4px;
-		border-radius: 1px;
+		width: 6px;
+		height: 6px;
+		border-radius: 1.5px;
 		background: var(--input);
 		opacity: 0.45;
 	}
@@ -61,10 +61,10 @@
 		align-items: baseline;
 		gap: 8px;
 		font-family: var(--font-mono);
-		font-size: 11px;
+		font-size: 12px;
 		color: var(--muted-2);
 	}
 	.meta .micro {
-		font-size: 10px;
+		font-size: 11px;
 	}
 </style>
