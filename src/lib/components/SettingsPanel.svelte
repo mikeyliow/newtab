@@ -16,7 +16,7 @@
 		progress: 'Progress',
 		focus: 'Tagline',
 		items: 'Items',
-		queue: 'Reading list',
+		queue: 'Library',
 		sports: 'Up next',
 		calories: 'Calories',
 		budget: 'Budget (parked)',

@@ -21,7 +21,6 @@
 </script>
 
 <section>
-	<div class="widget-head"><h2>Up next</h2></div>
 	<div class="stack">
 		<div class="card block" title={next ? `round ${nextIdx + 1} of ${races.length}` : 'season over'}>
 			<div class="dots">
@@ -42,7 +41,9 @@
 						<span class="title">{next.name}</span>
 						<span class="meta">{next.location} · {shortDate(next.date)}</span>
 					</div>
-					<span class="count">{daysAway(next.date) === 0 ? 'today' : `${daysAway(next.date)}d`}</span>
+					<span class="chip f1-chip">
+						{daysAway(next.date) === 0 ? 'today' : `${daysAway(next.date)}d`}
+					</span>
 				</div>
 			{:else}
 				<p class="empty">Season's over — see you in March.</p>
@@ -58,7 +59,7 @@
 							<span class="title">Raptors {raptors.next.home ? 'vs' : '@'} {raptors.next.opponent}</span>
 							<span class="meta">{shortDate(raptors.next.date)}</span>
 						</div>
-						<span class="count">
+						<span class="chip f1-chip">
 							{daysAway(raptors.next.date) === 0 ? 'today' : `${daysAway(raptors.next.date)}d`}
 						</span>
 					</div>
@@ -66,9 +67,9 @@
 				{#if raptors.last}
 					<div class="line" class:dim={!!raptors.next}>
 						{#if !raptors.next}<span class="ic nba"><Basketball size={16} /></span>{/if}
+						<span class="chip wl" class:win={raptors.last.win}>{raptors.last.win ? 'W' : 'L'}</span>
 						<div class="text">
 							<span class="title small">
-								{raptors.last.win ? 'W' : 'L'}
 								{raptors.last.score}
 								{raptors.last.home ? 'vs' : '@'}
 								{raptors.last.opponent}
@@ -175,6 +176,27 @@
 		font-size: 12px;
 		color: var(--muted-foreground);
 		flex: none;
+	}
+	.chip {
+		font-family: var(--font-mono);
+		font-size: 12px;
+		font-weight: 500;
+		padding: 3px 9px;
+		border-radius: var(--radius-pill);
+		flex: none;
+	}
+	.f1-chip {
+		margin-left: auto;
+		color: var(--kind-do);
+		background: color-mix(in srgb, var(--kind-do) 14%, transparent);
+	}
+	.chip.wl {
+		color: var(--destructive);
+		background: color-mix(in srgb, var(--destructive) 13%, transparent);
+	}
+	.chip.wl.win {
+		color: var(--macro-p);
+		background: color-mix(in srgb, var(--macro-p) 15%, transparent);
 	}
 	.empty {
 		color: var(--muted-2);

@@ -14,10 +14,11 @@
 
 <section>
 	<div class="widget-head">
-		<h2>Reading list</h2>
+		<h2>Library</h2>
 		{#if queue.length}<span class="count">{queue.length}</span>{/if}
 	</div>
 	{#if queue.length}
+		<!-- fixed max height: the list scrolls inside itself, never pushes the page -->
 		<div class="card body">
 			{#each queue as item (item.id)}
 				{@const Icon = item.medium ? icons[item.medium] : Inbox}
@@ -69,6 +70,10 @@
 		padding: 6px 16px;
 		display: flex;
 		flex-direction: column;
+		max-height: 264px;
+		overflow-y: auto;
+		scrollbar-width: thin;
+		scrollbar-color: var(--border) transparent;
 	}
 	.row {
 		display: flex;

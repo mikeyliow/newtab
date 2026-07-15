@@ -87,7 +87,7 @@
 		text-align: left;
 		cursor: text;
 		font-family: var(--font-sans);
-		font-size: 15px;
+		font-size: 16px;
 		line-height: 1.4;
 		color: var(--muted-foreground);
 	}

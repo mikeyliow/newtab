@@ -52,8 +52,8 @@
 	// widgets split into the main column and the right sidebar, both config-ordered.
 	// progress renders in the header's time block, focus as the tagline under the greeting;
 	// their config entries still control visibility.
-	const MAIN = ['items'];
-	const SIDEBAR = ['queue', 'sports', 'shortcuts', 'calories', 'budget'];
+	const MAIN = ['items', 'shortcuts'];
+	const SIDEBAR = ['queue', 'sports', 'calories', 'budget'];
 	const showProgress = $derived(dash.config.widgets.some((w) => w.id === 'progress' && w.visible));
 	const showTagline = $derived(dash.config.widgets.some((w) => w.id === 'focus' && w.visible));
 	const visible = $derived(
@@ -111,6 +111,8 @@
 					<div>
 						{#if widget.id === 'items'}
 							<ItemsWidget items={dash.items} doneToday={dash.done_today} doneWeek={dash.done_week} />
+						{:else if widget.id === 'shortcuts'}
+							<ShortcutsWidget shortcuts={dash.config.shortcuts} />
 						{/if}
 					</div>
 				{/each}
@@ -122,8 +124,6 @@
 							<QueueWidget items={dash.items} />
 						{:else if widget.id === 'sports'}
 							<SportsWidget raptors={data.raptors} />
-						{:else if widget.id === 'shortcuts'}
-							<ShortcutsWidget shortcuts={dash.config.shortcuts} />
 						{:else if widget.id === 'calories'}
 							<CaloriesWidget meals={dash.meals} totals={dash.meal_totals} target={dash.config.calorie_target} />
 						{/if}
@@ -169,12 +169,12 @@
 		text-shadow: 0 1px 12px color-mix(in srgb, var(--background) 70%, transparent);
 	}
 	main {
-		max-width: 1280px;
+		max-width: 1560px;
 		margin: 0 auto;
-		padding: 44px 48px 96px;
+		padding: 40px 56px 40px;
 		display: flex;
 		flex-direction: column;
-		gap: 36px;
+		gap: 30px;
 	}
 	.top {
 		display: flex;
@@ -184,17 +184,23 @@
 	.quick {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px;
-		margin-top: 16px;
+		gap: 10px;
+		margin-top: 18px;
 	}
 	.quick a {
 		text-decoration: none;
-		gap: 7px;
+		gap: 8px;
+		font-size: 14.5px;
+		padding: 10px 18px;
+		border-radius: var(--radius-md);
 	}
 	h1 {
-		font-size: 44px;
-		letter-spacing: -1.3px;
+		font-size: 52px;
+		letter-spacing: -1.6px;
 		margin-top: 2px;
+	}
+	.hello > :global(.micro) {
+		font-size: 13px;
 	}
 	.top-right {
 		display: flex;
@@ -207,9 +213,9 @@
 	.clock {
 		display: inline-flex;
 		align-items: center;
-		gap: 12px;
+		gap: 14px;
 		font-family: var(--font-mono);
-		font-size: 40px;
+		font-size: 48px;
 		font-weight: 500;
 		letter-spacing: -0.03em;
 		line-height: 1;
@@ -242,8 +248,8 @@
 	}
 	.grid {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) 340px;
-		gap: 48px;
+		grid-template-columns: minmax(0, 1fr) 400px;
+		gap: 56px;
 		align-items: start;
 	}
 	.col {
