@@ -62,21 +62,33 @@
 				"sensitive": true
 			},
 			{
-				"id": "shortcuts",
+				"id": "queue",
 				"visible": true,
 				"order": 4,
 				"sensitive": false
 			},
 			{
+				"id": "sports",
+				"visible": true,
+				"order": 5,
+				"sensitive": false
+			},
+			{
+				"id": "shortcuts",
+				"visible": true,
+				"order": 6,
+				"sensitive": false
+			},
+			{
 				"id": "calories",
 				"visible": false,
-				"order": 5,
+				"order": 7,
 				"sensitive": true
 			},
 			{
 				"id": "budget",
 				"visible": false,
-				"order": 6,
+				"order": 8,
 				"sensitive": true
 			}
 		]

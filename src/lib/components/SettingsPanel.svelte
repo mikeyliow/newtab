@@ -14,8 +14,10 @@
 
 	const widgetNames: Record<string, string> = {
 		progress: 'Progress',
-		focus: 'Focus',
+		focus: 'Tagline',
 		items: 'Items',
+		queue: 'Queue',
+		sports: 'Up next',
 		calories: 'Calories',
 		budget: 'Budget (parked)',
 		shortcuts: 'Shortcuts'

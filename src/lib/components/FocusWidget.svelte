@@ -1,4 +1,5 @@
 <script lang="ts">
+	// personal tagline under the greeting — click to edit, stored in config.focus
 	import { api } from '$lib/client/api';
 
 	let { focus }: { focus: string } = $props();
@@ -16,57 +17,49 @@
 	}
 </script>
 
-<section>
-	<span class="micro">Focus</span>
-	{#if editing}
-		<!-- svelte-ignore a11y_autofocus -->
-		<input
-			bind:value={draft}
-			autofocus
-			onblur={save}
-			onkeydown={(e) => {
-				if (e.key === 'Enter') save();
-				if (e.key === 'Escape') editing = false;
-			}}
-		/>
-	{:else}
-		<button class="focus-line" class:placeholder={!focus} onclick={startEdit} title="click to edit">
-			{focus || 'What matters right now?'}
-		</button>
-	{/if}
-</section>
+{#if editing}
+	<!-- svelte-ignore a11y_autofocus -->
+	<input
+		bind:value={draft}
+		autofocus
+		onblur={save}
+		onkeydown={(e) => {
+			if (e.key === 'Enter') save();
+			if (e.key === 'Escape') editing = false;
+		}}
+	/>
+{:else}
+	<button class="tagline" class:placeholder={!focus} onclick={startEdit} title="click to edit">
+		{focus || 'add a tagline…'}
+	</button>
+{/if}
 
 <style>
-	section {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-	.focus-line {
+	.tagline {
 		background: none;
 		border: none;
 		padding: 0;
 		text-align: left;
 		cursor: text;
 		font-family: var(--font-sans);
-		font-size: 26px;
-		font-weight: 500;
-		letter-spacing: var(--tracking-tight);
-		line-height: 1.25;
-		color: var(--foreground);
+		font-size: 16px;
+		line-height: 1.4;
+		color: var(--muted-foreground);
+		margin-top: 2px;
 	}
-	.focus-line.placeholder {
+	.tagline.placeholder {
 		color: var(--muted-2);
 	}
 	input {
-		font-size: 26px;
-		font-weight: 500;
-		letter-spacing: var(--tracking-tight);
+		font-size: 16px;
 		padding: 0;
 		border: none;
 		border-bottom: 1px solid var(--border);
 		border-radius: 0;
 		background: none;
+		color: var(--muted-foreground);
+		margin-top: 2px;
+		width: min(420px, 90%);
 	}
 	input:focus {
 		outline: none;

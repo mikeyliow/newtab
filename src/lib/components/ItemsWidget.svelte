@@ -10,7 +10,13 @@
 
 	import { tick } from 'svelte';
 
-	let { items, doneToday = [] }: { items: Item[]; doneToday?: Item[] } = $props();
+	let {
+		items,
+		doneToday = [],
+		doneWeek = []
+	}: { items: Item[]; doneToday?: Item[]; doneWeek?: number[] } = $props();
+	const weekTotal = $derived(doneWeek.reduce((a, b) => a + b, 0));
+	const weekMax = $derived(Math.max(1, ...doneWeek));
 	let showDone = $state(false);
 	let titleInput = $state<HTMLInputElement | null>(null);
 
@@ -65,17 +71,25 @@
 
 	const kindLabels: Record<ItemKind, string> = { do: 'Do', think: 'Think', queue: 'Queue' };
 
+	// queue items live in their own sidebar widget; this view is do/think only
 	const filtered = $derived(
 		items.filter(
-			(i) => i.status === 'open' && (i.context ? selected.includes(i.context) : selected.includes('untagged'))
+			(i) =>
+				i.status === 'open' &&
+				i.kind !== 'queue' &&
+				(i.context ? selected.includes(i.context) : selected.includes('untagged'))
 		)
 	);
-	// flat, compact list: pinned first (they took over the old Now strip), then do → think → queue
-	const byKind = (list: Item[]) => KINDS.flatMap((k) => list.filter((i) => i.kind === k));
-	const sorted = $derived([
-		...byKind(filtered.filter((i) => i.flagged)),
-		...byKind(filtered.filter((i) => !i.flagged))
-	]);
+	const pinnedFirst = (list: Item[]) => [
+		...list.filter((i) => i.flagged),
+		...list.filter((i) => !i.flagged)
+	];
+	const sections = $derived(
+		[
+			{ label: 'Today', items: pinnedFirst(filtered.filter((i) => i.kind === 'do')) },
+			{ label: 'Later', items: pinnedFirst(filtered.filter((i) => i.kind === 'think')) }
+		].filter((s) => s.items.length)
+	);
 
 	async function add(e: SubmitEvent) {
 		e.preventDefault();
@@ -103,6 +117,14 @@
 <section>
 	<div class="widget-head">
 		<h2>Items</h2>
+		{#if weekTotal}
+			<span class="spark" title="{weekTotal} done in the last 7 days">
+				{#each doneWeek as c, i (i)}
+					<span class="spark-bar" style:height="{4 + (c / weekMax) * 10}px" class:zero={!c}></span>
+				{/each}
+				<span class="spark-label">{weekTotal} this wk</span>
+			</span>
+		{/if}
 		<div class="head-actions">
 			<div class="filter-wrap">
 				<button
@@ -162,12 +184,17 @@
 			</form>
 		{/if}
 
-		{#if sorted.length === 0}
+		{#if sections.length === 0}
 			<p class="empty">{filterActive ? 'Nothing matches the filter.' : 'Nothing here. Nice.'}</p>
 		{/if}
-		{#each sorted as item (item.id)}
-			<div animate:flip={{ duration: 220 }} in:slide={{ duration: 180 }} out:slide={{ duration: 160 }}>
-				<ItemRow {item} />
+		{#each sections as section (section.label)}
+			<div class="section">
+				<span class="micro section-label">{section.label} · {section.items.length}</span>
+				{#each section.items as item (item.id)}
+					<div animate:flip={{ duration: 220 }} in:slide={{ duration: 180 }} out:slide={{ duration: 160 }}>
+						<ItemRow {item} />
+					</div>
+				{/each}
 			</div>
 		{/each}
 	</div>
@@ -299,6 +326,37 @@
 	.empty {
 		color: var(--muted-2);
 		margin: 12px 0;
+	}
+	.spark {
+		display: inline-flex;
+		align-items: flex-end;
+		gap: 2px;
+		margin-left: 14px;
+	}
+	.spark-bar {
+		width: 4px;
+		border-radius: 1.5px;
+		background: var(--kind-queue);
+	}
+	.spark-bar.zero {
+		background: var(--accent);
+	}
+	.spark-label {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--muted-2);
+		margin-left: 6px;
+	}
+	.section {
+		display: flex;
+		flex-direction: column;
+	}
+	.section-label {
+		font-size: 10px;
+		margin-top: 12px;
+	}
+	.section:first-of-type .section-label {
+		margin-top: 4px;
 	}
 	.done-line {
 		display: inline-flex;

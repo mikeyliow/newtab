@@ -3,6 +3,8 @@
 	import FocusWidget from '$lib/components/FocusWidget.svelte';
 	import ProgressWidget from '$lib/components/ProgressWidget.svelte';
 	import ItemsWidget from '$lib/components/ItemsWidget.svelte';
+	import QueueWidget from '$lib/components/QueueWidget.svelte';
+	import SportsWidget from '$lib/components/SportsWidget.svelte';
 	import CaloriesWidget from '$lib/components/CaloriesWidget.svelte';
 	import ShortcutsWidget from '$lib/components/ShortcutsWidget.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
@@ -51,10 +53,12 @@
 	);
 
 	// widgets split into the main column and the right sidebar, both config-ordered.
-	// progress renders in the header's time block; its config entry still controls visibility.
-	const MAIN = ['focus', 'items'];
-	const SIDEBAR = ['shortcuts', 'calories', 'budget'];
+	// progress renders in the header's time block, focus as the tagline under the greeting;
+	// their config entries still control visibility.
+	const MAIN = ['items'];
+	const SIDEBAR = ['queue', 'sports', 'shortcuts', 'calories', 'budget'];
 	const showProgress = $derived(dash.config.widgets.some((w) => w.id === 'progress' && w.visible));
+	const showTagline = $derived(dash.config.widgets.some((w) => w.id === 'focus' && w.visible));
 	const visible = $derived(
 		[...dash.config.widgets].sort((a, b) => a.order - b.order).filter((w) => w.visible)
 	);
@@ -74,9 +78,12 @@
 	{/if}
 	<main>
 		<header class="top">
-			<div>
+			<div class="hello">
 				<span class="micro">{dateLine}</span>
 				<h1>{greeting}, {dash.config.name}.</h1>
+				{#if showTagline}
+					<FocusWidget focus={dash.config.focus} />
+				{/if}
 			</div>
 			<div class="top-right">
 				<span class="clock"><PhaseIcon size={24} aria-hidden="true" />{clock}</span>
@@ -97,10 +104,8 @@
 			<div class="col main-col">
 				{#each mainWidgets as widget (widget.id)}
 					<div class:sensitive-blur={privacy && widget.sensitive}>
-						{#if widget.id === 'focus'}
-							<FocusWidget focus={dash.config.focus} />
-						{:else if widget.id === 'items'}
-							<ItemsWidget items={dash.items} doneToday={dash.done_today} />
+						{#if widget.id === 'items'}
+							<ItemsWidget items={dash.items} doneToday={dash.done_today} doneWeek={dash.done_week} />
 						{/if}
 					</div>
 				{/each}
@@ -108,7 +113,11 @@
 			<div class="col side-col">
 				{#each sideWidgets as widget (widget.id)}
 					<div class:sensitive-blur={privacy && widget.sensitive}>
-						{#if widget.id === 'shortcuts'}
+						{#if widget.id === 'queue'}
+							<QueueWidget items={dash.items} />
+						{:else if widget.id === 'sports'}
+							<SportsWidget />
+						{:else if widget.id === 'shortcuts'}
 							<ShortcutsWidget shortcuts={dash.config.shortcuts} />
 						{:else if widget.id === 'calories'}
 							<CaloriesWidget meals={dash.meals} totals={dash.meal_totals} target={dash.config.calorie_target} />

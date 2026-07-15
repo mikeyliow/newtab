@@ -55,7 +55,9 @@ Single page, one glance — no sub-pages or tabs. Desktop is a two-column grid (
 - **Calories** renders as a compact sidebar card below shortcuts: kcal total (+ progress bar when a target is set) and three macro mini-bars coloured per macro, filled by each macro's share of calories (4/4/9 kcal per gram).
 - **Header** = date + a rotating greeting (`src/lib/greetings.ts`, bucketed by hour), a large clock with a sun-phase icon, and small status lines: local weather (Open-Meteo, keyless, coords hardcoded in `StatusLines.svelte`) and a US-market indicator (9:30–16:00 America/New_York — countdown when <24h away, pulsing dot while open).
 - **Progress** = a thin dot-grid strip above focus: month as day-dots, year as week-dots; filled = elapsed, terracotta = current, faint = remaining.
-- **Focus** = a one-line editable intention at the top of the main column (stored in config).
+- **Tagline** (widget id `focus`) = a one-line personal tagline under the greeting, click to edit (stored in `config.focus`).
+- **Items** is a read-style view: **Today** (`do`) and **Later** (`think`) sections with counts, plus a 7-day done sparkline in the heading. **Queue** items render as their own sidebar widget — the reading/watching/listening list. The long-term direction is read-mostly: agents and task-app syncs write via MCP, the page is for glancing.
+- **Up next** (widget id `sports`) = next F1 race from `src/lib/data/f1-2026.json` — a local, committed season calendar (no API); edit the file when the calendar changes. A Raptors slot can join it once a data source is picked.
 - **Theme** is a manual header toggle (light default, `.dark` class on `<html>`), persisted per device in `localStorage` — the system setting is ignored.
 - **Quick-add**: pressing `a` anywhere outside a field opens the add-item form focused. **Done today** shows as a small line under Items, expandable with per-item undo (sets status back to open).
 - **Privacy mode** (eye icon) blurs every widget with `sensitive: true` — for screen-sharing. Persisted per device in `localStorage`, not in config.

@@ -21,13 +21,16 @@ function assertOptional<T extends string>(
 	return assertOneOf(value, allowed, field);
 }
 
-function todayLocal(): string {
-	// server runs in UTC on Railway; TZ env var (e.g. Asia/Kuala_Lumpur) makes this local
-	const d = new Date();
+// server runs in UTC on Railway; TZ env var (e.g. Asia/Kuala_Lumpur) makes this local
+function fmtDate(d: Date): string {
 	const y = d.getFullYear();
 	const m = String(d.getMonth() + 1).padStart(2, '0');
 	const day = String(d.getDate()).padStart(2, '0');
 	return `${y}-${m}-${day}`;
+}
+
+function todayLocal(): string {
+	return fmtDate(new Date());
 }
 
 function rowToItem(row: any): Item {
@@ -323,12 +326,34 @@ export function getDashboard() {
 			)
 			.all() as any[]
 	).map(rowToItem);
+	// completions per day for the last 7 days (oldest → today), for the little sparkline
+	const weekRows = getDb()
+		.prepare(
+			`SELECT date(completed_at, 'localtime') AS d, COUNT(*) AS c FROM items
+			 WHERE status = 'done' AND date(completed_at, 'localtime') >= date('now', 'localtime', '-6 days')
+			 GROUP BY d`
+		)
+		.all() as { d: string; c: number }[];
+	const byDay = new Map(weekRows.map((r) => [r.d, r.c]));
+	const doneWeek = Array.from({ length: 7 }, (_, i) => {
+		const d = new Date();
+		d.setDate(d.getDate() - (6 - i));
+		return byDay.get(fmtDate(d)) ?? 0;
+	});
 	const meals = listMeals();
 	const totals = meals.reduce(
 		(acc, m) => ({ kcal: acc.kcal + m.kcal, p: acc.p + m.p, c: acc.c + m.c, f: acc.f + m.f }),
 		{ kcal: 0, p: 0, c: 0, f: 0 }
 	);
-	return { date: todayLocal(), config, items, done_today: doneToday, meals, meal_totals: totals };
+	return {
+		date: todayLocal(),
+		config,
+		items,
+		done_today: doneToday,
+		done_week: doneWeek,
+		meals,
+		meal_totals: totals
+	};
 }
 
 // ---- export (backup) ----
